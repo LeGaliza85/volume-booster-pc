@@ -34,6 +34,7 @@ class SettingsWindow:
         self.top.transient(app.root)
         self.top.protocol("WM_DELETE_WINDOW", self.close)
         self._capturing: str | None = None
+        self._max_entry: tk.Entry | None = None
         self._requirements = tk.Frame(self.top, bg=T.BG)
         self._build()
         self.refresh()
@@ -177,6 +178,25 @@ class SettingsWindow:
             font=(self.app.family, T.px(10)),
             anchor="w",
         ).pack(side="left")
+        # An explicit button, not just Enter: typing a value and closing the
+        # window used to lose it, because FocusOut does not fire on destroy.
+        W.PillButton(
+            row,
+            self.app.t("apply"),
+            self._commit_max,
+            family=self.app.family,
+            size=8,
+            weight="normal",
+            fill=T.SURFACE,
+            hover=T.SURFACE_HOVER,
+            pressed=T.SURFACE_HOVER,
+            fg=T.TEXT,
+            padx=12,
+            height=26,
+        ).pack(side="right")
+        tk.Label(
+            row, text="%", bg=T.BG, fg=T.MUTED, font=(self.app.family, T.px(10))
+        ).pack(side="right", padx=(0, 6))
         entry = tk.Entry(
             row,
             width=6,
@@ -192,12 +212,14 @@ class SettingsWindow:
             font=(self.app.family, T.px(10)),
         )
         entry.insert(0, str(self.app.settings["max_percent"]))
-        entry.pack(side="right", ipady=4)
+        entry.pack(side="right", ipady=4, padx=(0, 6))
         entry.bind("<Return>", lambda _event: self._set_max(entry))
         entry.bind("<FocusOut>", lambda _event: self._set_max(entry))
-        tk.Label(
-            row, text="%", bg=T.BG, fg=T.MUTED, font=(self.app.family, T.px(10))
-        ).pack(side="right", padx=(0, 6))
+        self._max_entry = entry
+
+    def _commit_max(self) -> None:
+        if self._max_entry is not None:
+            self._set_max(self._max_entry)
 
     def _set_max(self, entry: tk.Entry) -> None:
         try:
@@ -365,6 +387,7 @@ class SettingsWindow:
         self.refresh()
 
     def close(self) -> None:
+        self._commit_max()
         self._stop_capture()
         self.app.settings_window = None
         self.top.destroy()
