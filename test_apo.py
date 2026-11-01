@@ -9,12 +9,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-if not sys.platform.startswith("win"):
-    raise unittest.SkipTest("Equalizer APO engine is Windows-only")
-
-import apo
 import configfile
 import gainmath
+
+WINDOWS = sys.platform.startswith("win")
+
+if WINDOWS:
+    import apo
 
 USER_BLOCK = (
     "Device: Headphones\r\n"
@@ -46,6 +47,7 @@ class PercentMathTests(unittest.TestCase):
         self.assertEqual(gainmath.clamp_percent("nonsense"), gainmath.DEFAULT_PERCENT)
 
 
+@unittest.skipUnless(WINDOWS, "Equalizer APO engine is Windows-only")
 class IncludeFileTests(unittest.TestCase):
     def test_apply_adds_one_include_and_writes_the_gain(self):
         with tempfile.TemporaryDirectory() as tmp:
