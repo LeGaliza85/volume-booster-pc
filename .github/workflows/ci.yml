@@ -1,0 +1,32 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  quality:
+    name: ${{ matrix.os }} / py${{ matrix.python }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python: ["3.11", "3.12", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install tooling
+        run: python -m pip install --disable-pip-version-check ruff mypy
+      - name: Lint
+        run: ruff check .
+      - name: Types
+        run: mypy
+      - name: Tests
+        run: >
+          python -m unittest test_configfile test_apo test_i18n test_platform
+          test_settings test_diagnostics test_verify

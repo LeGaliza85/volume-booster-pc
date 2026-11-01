@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+build/
+dist/
+*.spec
+state.json
+settings.json
+.venv/
+venv/
+.idea/
+.vscode/
+.mypy_cache/
+.ruff_cache/

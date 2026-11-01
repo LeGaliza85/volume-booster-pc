@@ -1,0 +1,65 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. The fastest path to a fix is the support bundle:
+        run `BoostAudio.exe --diagnostics` and attach the zip it prints.
+        It contains no audio, and your user name and home path are replaced.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `BoostAudio.exe --version`
+      placeholder: BoostAudio 1.0.0
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows 11
+        - Windows 10
+        - Linux (PipeWire)
+        - Linux (PulseAudio)
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: status
+    attributes:
+      label: What does the status bar say?
+      options:
+        - Applied … · Equalizer APO
+        - Equalizer APO is not attached to any device
+        - The config was changed outside the app
+        - Boost engine not found
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Set the slider to …
+        2. Switch device to …
+        3. …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Support bundle
+      description: Drag the `diagnostics-*.zip` here, or paste the contents of `report.json`.
+    validations:
+      required: false

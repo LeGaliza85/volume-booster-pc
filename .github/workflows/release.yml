@@ -1,0 +1,88 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check pyinstaller
+      - name: Build
+        run: >
+          python -m PyInstaller --noconfirm --clean --onefile --windowed
+          --name BoostAudio
+          --icon assets/volume-amplifier.ico
+          --version-file version_info.txt
+          --add-data "assets/volume-amplifier.ico;assets"
+          app.py
+      - name: Package
+        shell: pwsh
+        run: |
+          Compress-Archive -LiteralPath dist/BoostAudio.exe, README.md, LICENSE `
+            -DestinationPath dist/BoostAudio-portable.zip -Force
+          $lines = @(
+            (Get-FileHash dist/BoostAudio.exe -Algorithm SHA256).Hash + "  BoostAudio.exe"
+            (Get-FileHash dist/BoostAudio-portable.zip -Algorithm SHA256).Hash + "  BoostAudio-portable.zip"
+          )
+          $lines | Set-Content dist/SHA256SUMS-windows.txt -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            dist/BoostAudio.exe
+            dist/BoostAudio-portable.zip
+            dist/SHA256SUMS-windows.txt
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Python, Tk and PyInstaller
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 python3-pip python3-tk
+          python3 -m pip install --break-system-packages --disable-pip-version-check pyinstaller
+      - name: Build
+        run: |
+          python3 -m PyInstaller --noconfirm --clean --onefile \
+            --name BoostAudio \
+            --add-data "assets/volume-amplifier.ico:assets" \
+            app.py
+      - name: Checksums
+        run: |
+          cd dist
+          sha256sum BoostAudio > SHA256SUMS-linux.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            dist/BoostAudio
+            dist/SHA256SUMS-linux.txt
+
+  publish:
+    needs: [windows, linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/windows/BoostAudio.exe
+            artifacts/windows/BoostAudio-portable.zip
+            artifacts/windows/SHA256SUMS-windows.txt
+            artifacts/linux/BoostAudio
+            artifacts/linux/SHA256SUMS-linux.txt
+          generate_release_notes: true
