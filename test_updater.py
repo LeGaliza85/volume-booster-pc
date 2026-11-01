@@ -1,14 +1,23 @@
-"""Tests for handing the installer over."""
+"""Tests for handing the installer over.
+
+The installer is a Windows thing, and so is the updater: on other platforms
+``launch`` declines before it ever starts a process, which is the behaviour these
+tests are not about.
+"""
 
 from __future__ import annotations
 
+import sys
 import unittest
 from pathlib import Path
 from unittest import mock
 
 import updater
 
+WINDOWS = sys.platform.startswith("win")
 
+
+@unittest.skipUnless(WINDOWS, "the installer only exists on Windows")
 class LaunchTests(unittest.TestCase):
     def test_it_runs_the_installer_silently_and_detached(self):
         setup = Path(r"C:\Temp\VolumeBoosterSetup.exe")
@@ -24,6 +33,13 @@ class LaunchTests(unittest.TestCase):
     def test_a_failure_to_start_is_reported(self):
         with mock.patch.object(updater.subprocess, "Popen", side_effect=OSError("nope")):
             self.assertFalse(updater.launch(Path(r"C:\Temp\a.exe")))
+
+
+class PlatformTests(unittest.TestCase):
+    def test_other_platforms_decline(self):
+        if WINDOWS:
+            self.skipTest("this asserts the non-Windows branch")
+        self.assertFalse(updater.launch(Path("/tmp/setup.exe")))
 
 
 class BuildTests(unittest.TestCase):
