@@ -25,6 +25,8 @@
 
 [![ci](https://github.com/LeGaliza85/volume-booster-pc/actions/workflows/ci.yml/badge.svg)](https://github.com/LeGaliza85/volume-booster-pc/actions/workflows/ci.yml)
 
+**Website and FAQ:** <https://legaliza85.github.io/volume-booster-pc/>
+
 **A free, open-source volume booster for PC that raises Windows audio above the
 100 % ceiling — up to 500 % (1000 % if you insist) — with no latency added and no
 telemetry at all.**
