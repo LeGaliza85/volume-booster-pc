@@ -1,35 +1,29 @@
-"""Tests for the detached installer hand-over."""
+"""Tests for handing the installer over."""
 
 from __future__ import annotations
 
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import updater
 
 
-class ScriptTests(unittest.TestCase):
-    def test_it_waits_installs_silently_and_relaunches(self):
-        text = updater.script(
-            Path(r"C:\Temp\VolumeBoosterSetup.exe"),
-            Path(r"C:\Apps\Volume Booster\VolumeBooster.exe"),
-        )
-        self.assertIn('start "" /wait "C:\\Temp\\VolumeBoosterSetup.exe"', text)
-        self.assertIn("/VERYSILENT", text)
-        self.assertIn("/SUPPRESSMSGBOXES", text)
-        self.assertIn("/NORESTART", text)
-        self.assertIn('start "" "C:\\Apps\\Volume Booster\\VolumeBooster.exe"', text)
-        self.assertIn('del /q "%~f0"', text)
-        self.assertIn(':waitforinstaller', text)
-        self.assertIn('goto waitforinstaller', text)
-        self.assertIn('del /q "C:\\Temp\\VolumeBoosterSetup.exe"', text)
+class LaunchTests(unittest.TestCase):
+    def test_it_runs_the_installer_silently_and_detached(self):
+        setup = Path(r"C:\Temp\VolumeBoosterSetup.exe")
+        with mock.patch.object(updater.subprocess, "Popen") as popen:
+            self.assertTrue(updater.launch(setup))
+        popen.assert_called_once()
+        args, kwargs = popen.call_args
+        self.assertEqual(args[0][0], str(setup))
+        for flag in ("/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART"):
+            self.assertIn(flag, args[0])
+        self.assertIn("creationflags", kwargs)
 
-    def test_it_waits_before_installing(self):
-        self.assertIn("ping -n 4", updater.script(Path("a"), Path("b"), wait=3))
-
-    def test_it_is_plain_ascii(self):
-        text = updater.script(Path(r"C:\Temp\a.exe"), Path(r"C:\b.exe"))
-        text.encode("ascii")
+    def test_a_failure_to_start_is_reported(self):
+        with mock.patch.object(updater.subprocess, "Popen", side_effect=OSError("nope")):
+            self.assertFalse(updater.launch(Path(r"C:\Temp\a.exe")))
 
 
 class BuildTests(unittest.TestCase):

@@ -531,10 +531,11 @@ class AmplifierApp:
             self._set_status(self.t("update_install_failed"), "error")
             if self.tray is not None:
                 self.tray.notify(version.APP_NAME, self.t("update_install_failed"))
-            updater.cleanup()
+            with contextlib.suppress(OSError):
+                (Path(tempfile.gettempdir()) / update.SETUP_NAME).unlink()
             return
         LOG.info("auto update: verified, handing over to the installer")
-        if updater.launch(path, Path(sys.executable)):
+        if updater.launch(path):
             self.quit()
             return
         LOG.warning("auto update: could not start the installer")

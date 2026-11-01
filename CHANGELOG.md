@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5.3] - 2026-11-01
+
+### Fixed
+
+- **The app did not come back after an automatic update.** The detached batch that
+  waited for the installer raced with Inno re-executing itself: sometimes it
+  relaunched too early (`Failed to load Python DLL`), sometimes it never relaunched
+  at all and left the batch and the 14 MB installer behind.
+- The batch is gone. The installer now runs the app from its own `[Run]` entry, so
+  the restart happens exactly when Inno knows the files are written. `updater.py`
+  shrank to "is this an installed build" plus "start the installer silently".
+
 ## [1.5.2] - 2026-11-01
 
 ### Fixed

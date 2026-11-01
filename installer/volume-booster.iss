@@ -59,4 +59,7 @@ Name: "{group}\{cm:UninstallProgram,{#AppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(AppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+; No skipifsilent and no postinstall: the updater runs this installer silently and
+; needs the app to come back on its own, at the moment Inno knows the files are
+; fully written. Letting the batch guess that moment caused a race.
+Filename: "{app}\{#AppExeName}"; Flags: nowait
