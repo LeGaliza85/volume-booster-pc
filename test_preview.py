@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import struct
+import sys
 import unittest
 import wave
 
@@ -66,6 +67,17 @@ class AmplitudeTests(unittest.TestCase):
     def test_extremes_do_not_explode(self):
         self.assertGreaterEqual(preview.amplitude_for(-4000), 0.0)
         self.assertEqual(preview.amplitude_for(4000), preview.MAX_AMPLITUDE)
+
+
+class PlayTests(unittest.TestCase):
+    def test_a_silent_tone_plays_or_declines_cleanly(self):
+        # winsound refuses SND_MEMORY together with SND_ASYNC, so play() must go
+        # through a file; this fails loudly if somebody switches it back.
+        result = preview.play(preview.tone(0.0, 20))
+        if sys.platform.startswith("win"):
+            self.assertTrue(result)
+        else:
+            self.assertFalse(result)
 
 
 if __name__ == "__main__":

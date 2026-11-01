@@ -59,16 +59,40 @@ def amplitude_for(delta_db: float) -> float:
     return min(MAX_AMPLITUDE, BASE_AMPLITUDE * factor)
 
 
+def _slot_path(index: int):
+    import tempfile
+    from pathlib import Path
+
+    return Path(tempfile.gettempdir()) / f"volume-booster-preview-{index}.wav"
+
+
+_SLOT = 0
+
+
 def play(wav: bytes) -> bool:
-    """Play asynchronously through the default endpoint. False when unsupported."""
+    """Play asynchronously through the default endpoint. False when unsupported.
+
+    ``winsound`` refuses ``SND_MEMORY`` together with ``SND_ASYNC`` (it raises
+    "Cannot play asynchronously from memory"), so the tone goes through a small
+    file. Two alternating names keep the write away from the file being played.
+    """
+    global _SLOT
     if not sys.platform.startswith("win"):
         return False
     try:
         import winsound
     except ImportError:
         return False
+    target = _slot_path(_SLOT)
+    _SLOT = 1 - _SLOT
     try:
-        winsound.PlaySound(wav, winsound.SND_MEMORY | winsound.SND_ASYNC | winsound.SND_NODEFAULT)
+        target.write_bytes(wav)
+    except OSError:
+        return False
+    try:
+        winsound.PlaySound(
+            str(target), winsound.SND_FILENAME | winsound.SND_ASYNC | winsound.SND_NODEFAULT
+        )
     except RuntimeError:
         return False
     return True

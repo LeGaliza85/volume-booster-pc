@@ -206,10 +206,20 @@ class ToggleSwitch(tk.Canvas):
         self._value = bool(value)
         self._command = command
         self.configure(cursor="hand2", takefocus=1)
-        self.bind("<Button-1>", lambda _event: self._command(not self._value))
-        self.bind("<Return>", lambda _event: self._command(not self._value))
-        self.bind("<space>", lambda _event: self._command(not self._value))
+        self.bind("<Button-1>", lambda _event: self._toggle())
+        self.bind("<Return>", lambda _event: self._toggle())
+        self.bind("<space>", lambda _event: self._toggle())
         self._draw()
+
+    def _toggle(self) -> None:
+        """Flip first, then report: the widget owns its look, the caller the effect.
+
+        Callers that refuse the change call ``set_state`` with the old value, so
+        the switch always matches what actually happened.
+        """
+        value = not self._value
+        self.set_state(value)
+        self._command(value)
 
     def get(self) -> bool:
         return self._value

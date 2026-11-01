@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.1] - 2026-11-01
+
+### Fixed
+
+- The preview tone produced no sound at all: winsound refuses `SND_MEMORY` together
+  with `SND_ASYNC` (it raises `Cannot play asynchronously from memory`) and the
+  error was swallowed. The tone now goes through a small file played
+  asynchronously, alternating two names so the write never touches the file being
+  played.
+- Every toggle in Settings did nothing: `ToggleSwitch` reported the new value but
+  never updated its own, so it looked frozen and repeated clicks sent the same
+  state. The widget now flips itself before calling back, and callers that refuse
+  a change still call `set_state` to put it back. This also fixes the checkbox in
+  the loud-level warning.
+
 ## [1.3.0] - 2026-11-01
 
 ### Added
