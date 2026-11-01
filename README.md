@@ -134,11 +134,18 @@ the notification area at all.
 
 Click **Setup** and you get a real settings window, not a message box:
 
-- **Windows setup** — the four things Windows needs, each with its state and a
-  button that opens the exact place where the fix lives (the Equalizer APO
-  download, the Configurator, or the sound settings for your device). If something
-  is failing, the app tells you here instead of leaving you guessing.
-- **Global hotkeys** — click a shortcut and press the combination you want.
+- **Windows setup** — only what actually needs attention. With Equalizer APO
+  missing you get one red row and a **Download** button; once it is installed that
+  row disappears. With the APO attached, the row offers **Change** to open the
+  Configurator and pick other devices. The Enhancements row carries an **Open
+  Sound** button and the exact click path, because Windows has no way to open one
+  device's properties page directly. The reboot hint only appears while the APO is
+  not attached yet.
+- **Global hotkeys** — click a shortcut and press the combination you want; Esc
+  cancels.
+- **Sound** — the slider preview tone and the loud-level warning.
+- **Updates** — check for updates at startup (off by default), plus a **Check for
+  updates** link at the bottom of the main window.
 - **Startup** — start in the notification area, and close to it.
 
 If you push the slider into a very loud level, the app asks first. That warning
@@ -157,6 +164,7 @@ has a **Don't ask again** switch, and you can turn it back on from
 | `hotkey_up` | `Ctrl+Alt+Up` | hotkey | Louder by 10 %; empty string disables it |
 | `hotkey_down` | `Ctrl+Alt+Down` | hotkey | Quieter by 10 %; empty string disables it |
 | `preview_sound` | `true` | bool | Play a tone while moving the slider |
+| `check_updates` | `false` | bool | Check GitHub for a new release at startup |
 
 Invalid values are ignored and clamped. A corrupted file never crashes the app —
 it just falls back to the defaults.
@@ -191,7 +199,10 @@ which is the one thing it is not allowed to be.
 
 ## Privacy and safety
 
-- **No telemetry, no analytics, no network calls.** Not even a version check.
+- **No telemetry, no analytics.** The only network call is the update check: it
+  runs when you press **Check for updates**, or at startup if you turn that on in
+  Settings. It asks GitHub for the latest release tag and sends nothing about you —
+  not even which version you have.
 - **Audio never leaves the machine.** The app writes one number into one text
   file. That is the whole pipeline.
 - **The rest of your config is untouched.** It owns one include file
@@ -253,7 +264,7 @@ and writes `dist\SHA256SUMS.txt`. On Linux, `./build.sh`.
 ## Tests
 
 ```
-python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report test_hotkey test_winenv test_preview
+python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report test_hotkey test_winenv test_preview test_update
 python app.py --smoke
 python app.py --smoke-ui
 ```

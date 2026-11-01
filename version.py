@@ -4,7 +4,7 @@ from __future__ import annotations
 
 APP_NAME = "Volume Booster"
 APP_ID = "VolumeBooster"
-VERSION = "1.3.1"
+VERSION = "1.4.0"
 AUTHOR = "LeGaliza85"
 AUTHOR_URL = "https://github.com/LeGaliza85"
 REPOSITORY = "https://github.com/LeGaliza85/volume-booster-pc"

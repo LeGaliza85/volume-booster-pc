@@ -21,6 +21,7 @@ DEFAULTS: dict = {
     "hotkey_up": "Ctrl+Alt+Up",
     "hotkey_down": "Ctrl+Alt+Down",
     "preview_sound": True,
+    "check_updates": False,
 }
 
 LIMITS: dict[str, tuple[int, int]] = {
@@ -28,7 +29,7 @@ LIMITS: dict[str, tuple[int, int]] = {
     "confirm_above": (0, 1000),
 }
 
-BOOLEANS = ("restore_on_exit", "start_hidden", "close_to_tray", "preview_sound")
+BOOLEANS = ("restore_on_exit", "start_hidden", "close_to_tray", "preview_sound", "check_updates")
 HOTKEYS = ("hotkey_up", "hotkey_down")
 
 

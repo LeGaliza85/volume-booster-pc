@@ -1,4 +1,8 @@
-"""Tests for the Windows requirement rows (no Windows calls involved)."""
+"""Tests for the Windows requirement rows (no Windows calls involved).
+
+The contract is "only what needs attention": a missing APO hides everything else,
+and the reboot advice only appears while the APO is not attached yet.
+"""
 
 from __future__ import annotations
 
@@ -7,49 +11,59 @@ import unittest
 import winenv
 
 
-def states(rows: list[dict]) -> dict[str, str]:
-    return {row["key"]: row["state"] for row in rows}
+def by_key(rows: list[dict]) -> dict[str, dict]:
+    return {row["key"]: row for row in rows}
 
 
-def actions(rows: list[dict]) -> dict[str, str]:
-    return {row["key"]: row["action"] for row in rows}
-
-
-class InspectTests(unittest.TestCase):
-    def test_everything_fine(self):
-        rows = winenv.inspect(installed=True, level="ok")
-        self.assertEqual(states(rows)["req_engine"], winenv.OK)
-        self.assertEqual(states(rows)["req_attached"], winenv.OK)
-        self.assertEqual(actions(rows)["req_engine"], winenv.NONE)
-        self.assertEqual(actions(rows)["req_attached"], winenv.NONE)
-
-    def test_missing_engine_offers_the_download(self):
+class MissingApoTests(unittest.TestCase):
+    def test_only_the_download_row_is_returned(self):
         rows = winenv.inspect(installed=False, level="missing")
-        self.assertEqual(states(rows)["req_engine"], winenv.FAIL)
-        self.assertEqual(actions(rows)["req_engine"], winenv.OPEN_DOWNLOAD)
+        self.assertEqual([row["key"] for row in rows], ["req_engine"])
+        self.assertEqual(rows[0]["state"], winenv.FAIL)
+        self.assertEqual(rows[0]["action"], winenv.OPEN_DOWNLOAD)
+        self.assertEqual(rows[0]["label"], "download")
 
-    def test_detached_offers_the_configurator(self):
-        rows = winenv.inspect(installed=True, level="detached")
-        self.assertEqual(states(rows)["req_engine"], winenv.OK)
-        self.assertEqual(states(rows)["req_attached"], winenv.FAIL)
-        self.assertEqual(actions(rows)["req_attached"], winenv.OPEN_CONFIGURATOR)
+
+class AttachedTests(unittest.TestCase):
+    def test_nothing_red_and_no_reboot_advice(self):
+        rows = by_key(winenv.inspect(installed=True, level="ok"))
+        self.assertEqual(rows["req_attached"]["state"], winenv.OK)
+        self.assertEqual(rows["req_attached"]["action"], winenv.OPEN_CONFIGURATOR)
+        self.assertEqual(rows["req_attached"]["label"], "change")
+        self.assertNotIn("req_reboot", rows)
+        self.assertNotIn("req_engine", rows)
 
     def test_drift_still_counts_as_attached(self):
-        rows = winenv.inspect(installed=True, level="drift")
-        self.assertEqual(states(rows)["req_attached"], winenv.OK)
+        rows = by_key(winenv.inspect(installed=True, level="drift"))
+        self.assertEqual(rows["req_attached"]["state"], winenv.OK)
+        self.assertNotIn("req_reboot", rows)
 
-    def test_advice_rows_are_informational(self):
-        rows = winenv.inspect(installed=True, level="ok")
-        self.assertEqual(states(rows)["req_enhancements"], winenv.INFO)
-        self.assertEqual(states(rows)["req_reboot"], winenv.INFO)
-        self.assertEqual(actions(rows)["req_enhancements"], winenv.OPEN_SOUND)
-        self.assertEqual(actions(rows)["req_reboot"], winenv.NONE)
+    def test_enhancements_is_advice_with_a_button(self):
+        rows = by_key(winenv.inspect(installed=True, level="ok"))
+        self.assertEqual(rows["req_enhancements"]["state"], winenv.INFO)
+        self.assertEqual(rows["req_enhancements"]["action"], winenv.OPEN_SOUND)
+        self.assertEqual(rows["req_enhancements"]["label"], "open_sound")
 
-    def test_every_row_has_a_key_and_an_action(self):
-        for row in winenv.inspect(installed=False, level="missing"):
-            self.assertTrue(row["key"])
-            allowed = {winenv.NONE, winenv.OPEN_DOWNLOAD, winenv.OPEN_CONFIGURATOR, winenv.OPEN_SOUND}
-            self.assertIn(row["action"], allowed)
+
+class DetachedTests(unittest.TestCase):
+    def test_red_row_with_the_configurator_and_a_reboot_hint(self):
+        rows = by_key(winenv.inspect(installed=True, level="detached"))
+        self.assertEqual(rows["req_attached"]["state"], winenv.FAIL)
+        self.assertEqual(rows["req_attached"]["action"], winenv.OPEN_CONFIGURATOR)
+        self.assertEqual(rows["req_attached"]["label"], "open")
+        self.assertEqual(rows["req_reboot"]["state"], winenv.INFO)
+        self.assertEqual(rows["req_reboot"]["action"], winenv.NONE)
+
+
+class ShapeTests(unittest.TestCase):
+    def test_every_row_is_renderable(self):
+        allowed = {winenv.NONE, winenv.OPEN_DOWNLOAD, winenv.OPEN_CONFIGURATOR, winenv.OPEN_SOUND}
+        for installed, level in ((False, "missing"), (True, "ok"), (True, "detached")):
+            for row in winenv.inspect(installed=installed, level=level):
+                self.assertTrue(row["key"])
+                self.assertIn(row["state"], {winenv.OK, winenv.FAIL, winenv.INFO})
+                self.assertIn(row["action"], allowed)
+                self.assertTrue(row["label"])
 
 
 if __name__ == "__main__":

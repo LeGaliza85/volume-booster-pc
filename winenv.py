@@ -1,9 +1,13 @@
 """Windows-side requirements: what to check, and where to send the user to fix it.
 
-The app can only *detect* part of this. Equalizer APO installed and attached are
-readable from the registry; "Disable all enhancements" and "you have not
-rebooted" are not, so those are shown as advice rather than as a pass/fail the
-code would be inventing.
+Only what actually needs attention is returned. A row that is fine and has
+nothing to do would just be noise, and the settings window is a list of things to
+fix, not a status screen.
+
+The two things the app cannot detect are shown as instructions, never as a fake
+verdict: whether "Disable all enhancements" is ticked, and whether Windows still
+wants a reboot. The second one is inferred from the APO not being attached yet,
+which is the only reboot signal that belongs to this app's domain.
 """
 
 from __future__ import annotations
@@ -71,10 +75,14 @@ def open_configurator() -> bool:
 
 
 def open_sound() -> bool:
-    """Sound settings, where enhancements live for each playback device."""
+    """The Sound control panel, where a device's Enhancements tab lives.
+
+    Windows has no documented way to open one device's properties page directly,
+    so this lands on the Playback tab and the instructions say what to click next.
+    """
     if not sys.platform.startswith("win"):
         return False
-    for target in ("ms-settings:sound", "mmsys.cpl"):
+    for target in ("mmsys.cpl", "ms-settings:sound"):
         if _startfile(target):
             return True
     try:
@@ -95,27 +103,34 @@ def open_action(action: str) -> bool:
 
 
 def inspect(*, installed: bool, level: str) -> list[dict]:
-    """Rows for the settings window. ``level`` is the engine health level."""
+    """Rows that need the user's attention, in the order they should be fixed."""
     attached = level in ("ok", "drift")
-    return [
-        {
-            "key": "req_engine",
-            "state": OK if installed else FAIL,
-            "action": NONE if installed else OPEN_DOWNLOAD,
-        },
+    if not installed:
+        return [
+            {
+                "key": "req_engine",
+                "state": FAIL,
+                "action": OPEN_DOWNLOAD,
+                "label": "download",
+            }
+        ]
+
+    rows: list[dict] = [
         {
             "key": "req_attached",
             "state": OK if attached else FAIL,
-            "action": NONE if attached else OPEN_CONFIGURATOR,
+            "action": OPEN_CONFIGURATOR,
+            "label": "change" if attached else "open",
         },
         {
             "key": "req_enhancements",
             "state": INFO,
             "action": OPEN_SOUND,
-        },
-        {
-            "key": "req_reboot",
-            "state": INFO,
-            "action": NONE,
+            "label": "open_sound",
         },
     ]
+    if not attached:
+        # Attached means the APO is already running, so there is nothing to reboot
+        # for. Not attached right after an install usually is a pending restart.
+        rows.append({"key": "req_reboot", "state": INFO, "action": NONE, "label": NONE})
+    return rows

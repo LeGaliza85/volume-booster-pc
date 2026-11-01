@@ -7,6 +7,7 @@ lives.
 
 from __future__ import annotations
 
+import contextlib
 import functools
 import tkinter as tk
 
@@ -56,7 +57,7 @@ class SettingsWindow:
         self._hotkey_row("hotkey_down", self.app.t("hotkey_down"))
         self._hotkey_hint = tk.Label(
             self.top,
-            text="",
+            text=self.app.t("hotkey_hint"),
             bg=T.BG,
             fg=T.MUTED,
             font=(self.app.family, T.px(8)),
@@ -69,6 +70,9 @@ class SettingsWindow:
         self._section(self.app.t("sound_section"))
         self._toggle_row("preview_sound", self.app.t("preview_sound"))
         self._warn_row()
+
+        self._section(self.app.t("updates_section"))
+        self._toggle_row("check_updates", self.app.t("check_updates"))
 
         self._section(self.app.t("start_section"))
         self._toggle_row("start_hidden", self.app.t("start_hidden"))
@@ -198,7 +202,7 @@ class SettingsWindow:
         if action != winenv.NONE:
             W.PillButton(
                 row,
-                self.app.t("open"),
+                self.app.t(requirement.get("label", "open")),
                 lambda name=action: winenv.open_action(name),
                 family=self.app.family,
                 size=8,
@@ -215,9 +219,13 @@ class SettingsWindow:
     def _start_capture(self, key: str) -> None:
         self._capturing = key
         self._fields[key].configure(text=self.app.t("hotkey_press"), fg=T.ACCENT)
-        self._hotkey_hint.configure(text="")
+        self._hotkey_hint.configure(text=self.app.t("hotkey_hint"), fg=T.MUTED)
         self.app.suspend_hotkeys()
         self.top.focus_force()
+        # A local grab guarantees the keypress lands here even if the window is
+        # not the active one; Escape (or any accepted combination) releases it.
+        with contextlib.suppress(tk.TclError):
+            self.top.grab_set()
         self.top.bind("<KeyPress>", self._on_capture_key)
 
     def _stop_capture(self) -> None:
@@ -226,7 +234,10 @@ class SettingsWindow:
         key = self._capturing
         self._capturing = None
         self.top.unbind("<KeyPress>")
+        with contextlib.suppress(tk.TclError):
+            self.top.grab_release()
         self._fields[key].configure(text=self._hotkey_text(key), fg=T.TEXT)
+        self._hotkey_hint.configure(text=self.app.t("hotkey_hint"), fg=T.MUTED)
         self.app.resume_hotkeys()
 
     def _on_capture_key(self, event) -> str:

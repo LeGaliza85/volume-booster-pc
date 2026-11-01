@@ -4,6 +4,25 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] - 2026-11-01
+
+### Changed
+
+- The settings window only lists what needs attention. A missing Equalizer APO is
+  one red row with a **Download** button; once installed, the row disappears. The
+  attached-device row offers **Change** when everything is fine, and the reboot
+  hint only appears while the APO is not attached yet.
+- The Enhancements row now says exactly what the button does and which clicks
+  follow, since Windows cannot open a single device's properties page directly.
+- Hotkey capture grabs the keyboard while it waits, so the combination always
+  lands on the field, and the hint explains how to edit them.
+
+### Added
+
+- **Check for updates** link in the window and an **Updates** section in settings.
+  The automatic check is off by default; the manual one is the only network call
+  the app makes, and it sends nothing about the user.
+
 ## [1.3.1] - 2026-11-01
 
 ### Fixed

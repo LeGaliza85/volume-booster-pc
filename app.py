@@ -8,7 +8,9 @@ import functools
 import json
 import logging
 import os
+import queue
 import sys
+import threading
 import time
 import tkinter as tk
 import webbrowser
@@ -32,6 +34,7 @@ import settings
 import settingswindow
 import theme as T
 import tray
+import update
 import version
 import widgets as W
 
@@ -152,6 +155,8 @@ class AmplifierApp:
         self.use_tray = use_tray
         self._toast_job: str | None = None
         self._last_preview = 0.0
+        self._checking_update = False
+        self._update_results: queue.Queue = queue.Queue()
         self.settings_window: settingswindow.SettingsWindow | None = None
         self.tray: tray.Tray | None = None
 
@@ -165,8 +170,12 @@ class AmplifierApp:
         self._apply(silent=True)
         self.root.protocol("WM_DELETE_WINDOW", self._on_close)
         self._start_tray()
-        if minimized or (self.settings["start_hidden"] and not self.first_run and self.tray is not None):
+        if minimized or (
+            self.settings["start_hidden"] and not self.first_run and self.tray is not None
+        ):
             self.root.withdraw()
+        if self.settings.get("check_updates"):
+            self.root.after(3000, lambda: self._check_updates(manual=False))
 
     # ------------------------------------------------------------ i18n
     def t(self, key: str, **values: object) -> str:
@@ -372,16 +381,31 @@ class AmplifierApp:
         )
         self.setup_button.pack(side="right")
 
+        links = tk.Frame(frame, bg=T.BG)
+        links.pack(anchor="w", pady=(10, 0))
         self.report_label = tk.Label(
-            frame,
+            links,
             text=self.t("report"),
             bg=T.BG,
             fg=T.MUTED,
             font=(self.family, T.px(8), "underline"),
             cursor="hand2",
         )
-        self.report_label.pack(anchor="w", pady=(10, 0))
+        self.report_label.pack(side="left")
         self.report_label.bind("<Button-1>", lambda _event: self._report_bug())
+        tk.Label(
+            links, text="\u00b7", bg=T.BG, fg=T.MUTED, font=(self.family, T.px(8))
+        ).pack(side="left", padx=6)
+        self.update_label = tk.Label(
+            links,
+            text=self.t("check_update"),
+            bg=T.BG,
+            fg=T.MUTED,
+            font=(self.family, T.px(8), "underline"),
+            cursor="hand2",
+        )
+        self.update_label.pack(side="left")
+        self.update_label.bind("<Button-1>", lambda _event: self._check_updates())
 
         self.root.update_idletasks()
         width = max(self.root.winfo_reqwidth(), 480)
@@ -415,6 +439,51 @@ class AmplifierApp:
         )
         LOG.info("opening the bug report form")
         webbrowser.open(url)
+
+    # ------------------------------------------------------------- updates
+    def _check_updates(self, *, manual: bool = True) -> None:
+        if self._checking_update:
+            return
+        self._checking_update = True
+        if manual:
+            self._set_status(self.t("checking_update"), "idle")
+        threading.Thread(target=self._update_worker, args=(manual,), daemon=True).start()
+        self.root.after(200, self._poll_update_result)
+
+    def _update_worker(self, manual: bool) -> None:
+        """Runs off the UI thread: urllib can block for seconds."""
+        self._update_results.put((manual, update.check()))
+
+    def _poll_update_result(self) -> None:
+        try:
+            manual, result = self._update_results.get_nowait()
+        except queue.Empty:
+            self.root.after(200, self._poll_update_result)
+            return
+        self._checking_update = False
+        self._handle_update_result(result, manual)
+
+    def _handle_update_result(self, result: dict, manual: bool) -> None:
+        status = result.get("status")
+        latest = result.get("latest") or ""
+        if status == update.STATUS_UNKNOWN:
+            LOG.info("update check failed")
+            self._set_status(self.t("update_failed"), "warn")
+            return
+        if status == update.STATUS_CURRENT:
+            LOG.info("update check: up to date")
+            self._set_status(self.t("update_current", version=version.VERSION), "ok")
+            return
+        LOG.info("update check: %s available", latest)
+        self._set_status(self.t("update_available", version=latest), "warn")
+        if not manual:
+            if self.tray is not None:
+                self.tray.notify(version.APP_NAME, self.t("update_available", version=latest))
+            return
+        if messagebox.askyesno(
+            self.t("update_title"), self.t("update_available", version=latest)
+        ):
+            webbrowser.open(result.get("url") or update.RELEASES_URL)
 
     # ------------------------------------------------------------ tray / hotkeys
     def _start_tray(self) -> None:
