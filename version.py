@@ -1,10 +1,10 @@
-﻿"""Single source of truth for the app identity and version."""
+"""Single source of truth for the app identity and version."""
 
 from __future__ import annotations
 
 APP_NAME = "Volume Booster"
 APP_ID = "VolumeBooster"
-VERSION = "1.2.0"
+VERSION = "1.2.1"
 AUTHOR = "LeGaliza85"
 AUTHOR_URL = "https://github.com/LeGaliza85"
 REPOSITORY = "https://github.com/LeGaliza85/volume-booster-pc"

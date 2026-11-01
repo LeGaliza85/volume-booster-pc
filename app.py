@@ -45,6 +45,7 @@ HOTKEY_UP = 1
 HOTKEY_DOWN = 2
 BOOST_STEP = 10
 TRAY_PUMP_MS = 60
+TOAST_DELAY_MS = 700
 
 
 def resource_path(relative: str) -> Path:
@@ -145,6 +146,7 @@ class AmplifierApp:
         self.family = T.pick_font(root)
         self._dot_colour = T.MUTED
         self.use_tray = use_tray
+        self._toast_job: str | None = None
         self.settings_window: settingswindow.SettingsWindow | None = None
         self.tray: tray.Tray | None = None
 
@@ -410,6 +412,7 @@ class AmplifierApp:
             LOG.info("tray unavailable, falling back to the taskbar")
             return
         LOG.info("tray icon active")
+        self.tray.set_tooltip(f"{version.APP_NAME} - {self.percent} %")
         self.root.after(TRAY_PUMP_MS, self._pump_tray)
         self._sync_hotkeys()
 
@@ -494,6 +497,30 @@ class AmplifierApp:
         high = int(self.settings["max_percent"])
         self.entry_var.set(str(max(low, min(high, self.percent + delta))))
         self._apply()
+        self._announce_level()
+
+    def _level_text(self) -> str:
+        gain = (
+            self.t("muted")
+            if self.percent == 0
+            else gainmath.format_db(gainmath.percent_to_db(self.percent))
+        )
+        return f"{self.percent} % \u00b7 {gain}"
+
+    def _announce_level(self) -> None:
+        """One toast for a burst of hotkey presses, and only while hidden."""
+        if self.tray is None or self.root.state() != "withdrawn":
+            return
+        if self._toast_job is not None:
+            self.root.after_cancel(self._toast_job)
+        self._toast_job = self.root.after(TOAST_DELAY_MS, self._show_level_toast)
+
+    def _show_level_toast(self) -> None:
+        self._toast_job = None
+        if self.tray is None:
+            return
+        if not self.tray.notify(version.APP_NAME, self._level_text()):
+            LOG.info("level toast not shown")
 
     def save_settings(self) -> None:
         settings.save(SETTINGS_PATH, self.settings)
@@ -582,6 +609,8 @@ class AmplifierApp:
 
         self._applied = value
         LOG.info("applied percent=%s engine=%s", value, self.engine.key)
+        if self.tray is not None:
+            self.tray.set_tooltip(f"{version.APP_NAME} - {value} %")
         gain = self.t("muted") if value == 0 else gainmath.format_db(
             gainmath.percent_to_db(value)
         )

@@ -117,7 +117,9 @@ a slot in the taskbar.
 - **Closing the window hides it**, it does not quit. The boost stays applied either
   way: Equalizer APO keeps it, so nothing is lost while the app is closed.
 - **Global hotkeys**: `Ctrl+Alt+Up` and `Ctrl+Alt+Down` by default, ten percent per
-  press. Change them — or clear them — from **Settings → Global hotkeys**.
+  press. Change them — or clear them — from **Settings → Global hotkeys**. The
+  tooltip shows the current level, and a notification pops up when you change it
+  while the window is hidden.
 - The very first run shows the window once, so you know where it went. After that
   it starts hidden.
 
@@ -157,6 +159,24 @@ it just falls back to the defaults.
 English, Español, Français, Deutsch, Italiano, Português (BR), Русский,
 简体中文, 日本語. The app starts in your system language and remembers what you
 pick.
+
+---
+
+## Which devices get boosted?
+
+All of them, by design: the gain sits before any `Device:` block, so every
+endpoint Equalizer APO is attached to gets the same level.
+
+If you want the boost on your headphones but not on your speakers, the right
+place is Equalizer APO's own device selection — that is exactly what its
+Configurator does, and the app takes you there with one click from
+**Settings → Attached to a playback device**.
+
+Per-device *gain* profiles are deliberately not implemented. Equalizer APO
+matches a `Device:` rule against the device name, the connection name and the
+GUID, and a rule that does not match is applied silently — no boost, no error.
+Shipping that would turn this app's "the boost is verified" promise into a guess,
+which is the one thing it is not allowed to be.
 
 ---
 

@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.1] - 2026-11-01
+
+### Added
+
+- Feedback when a hotkey changes the level while the window is hidden: the tray
+  tooltip always shows the current percentage, and one notification reports the
+  final value after a burst of presses (debounced, so ten presses are one toast).
+- README: the "Which devices get boosted?" section, explaining that device
+  selection belongs to Equalizer APO's Configurator — and why per-device gain
+  profiles are intentionally not implemented.
+
+### Note
+
+Per-device gain profiles were considered and rejected: a `Device:` rule that does
+not match is applied silently, so the feature could claim success while doing
+nothing on that device.
+
 ## [1.2.0] - 2026-11-01
 
 ### Added

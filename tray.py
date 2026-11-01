@@ -27,10 +27,14 @@ WM_LBUTTONDBLCLK = 0x0203
 WM_RBUTTONUP = 0x0205
 
 NIM_ADD = 0x00000000
+NIM_MODIFY = 0x00000001
 NIM_DELETE = 0x00000002
 NIF_MESSAGE = 0x00000001
 NIF_ICON = 0x00000002
 NIF_TIP = 0x00000004
+NIF_INFO = 0x00000010
+NIIF_NOSOUND = 0x00000010
+TOAST_MS = 4000
 
 IMAGE_ICON = 1
 LR_LOADFROMFILE = 0x00000010
@@ -251,6 +255,39 @@ class Tray:
         return self._active
 
     # -------------------------------------------------------------- hotkeys
+    def set_tooltip(self, text: str) -> None:
+        """Hover text, so the current level is visible without opening anything."""
+        if not self._active or self._nid is None:
+            return
+        try:
+            _user32, shell32, _kernel32 = _libraries()
+            notice = self._nid
+            notice.uFlags = NIF_TIP
+            notice.szTip = text[:_TIP_LIMIT]
+            shell32.Shell_NotifyIconW(NIM_MODIFY, ctypes.byref(notice))
+            notice.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP
+        except (AttributeError, OSError):
+            return
+
+    def notify(self, title: str, text: str) -> bool:
+        """Balloon/toast from the icon; the only feedback when the window is hidden."""
+        if not self._active or self._nid is None:
+            return False
+        try:
+            _user32, shell32, _kernel32 = _libraries()
+            notice = self._nid
+            notice.uFlags = NIF_INFO
+            notice.szInfoTitle = title[:63]
+            notice.szInfo = text[:255]
+            notice.dwInfoFlags = NIIF_NOSOUND
+            notice.uVersion = TOAST_MS
+            shown = bool(shell32.Shell_NotifyIconW(NIM_MODIFY, ctypes.byref(notice)))
+            notice.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP
+            notice.uVersion = 0
+            return shown
+        except (AttributeError, OSError):
+            return False
+
     def register_hotkey(self, ident: int, modifiers: int, key: int, callback: Callable[[], None]) -> bool:
         """False when Windows refuses, typically because another app owns it."""
         if not self._active or self._hwnd is None:
