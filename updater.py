@@ -33,12 +33,27 @@ def installed_build() -> bool:
 
 
 def script(setup: Path, app: Path, wait: int = WAIT_SECONDS) -> str:
-    """The batch text: wait, install silently, relaunch, clean up."""
+    """The batch text: wait, install silently, wait it out, relaunch, clean up.
+
+    ``start /wait`` is not enough on its own: Inno Setup can re-exec itself, so the
+    parent returns while the real install is still writing files. Relaunching at
+    that moment gives "Failed to load Python DLL", because the app extracts itself
+    from an executable that is being replaced. The loop waits for the setup process
+    to disappear before starting the app again.
+    """
+    setup_name = setup.name
     return "\r\n".join(
         [
             "@echo off",
             f"ping -n {wait + 1} 127.0.0.1 >nul",
             f'start "" /wait "{setup}" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART',
+            ":waitforinstaller",
+            f'tasklist /fi "imagename eq {setup_name}" 2>nul | find /i "{setup_name}" >nul',
+            "if not errorlevel 1 (",
+            "    ping -n 2 127.0.0.1 >nul",
+            "    goto waitforinstaller",
+            ")",
+            "ping -n 3 127.0.0.1 >nul",
             f'start "" "{app}"',
             f'del /q "{setup}"',
             'del /q "%~f0"',

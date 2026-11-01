@@ -4,6 +4,16 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5.2] - 2026-11-01
+
+### Fixed
+
+- **The app failed to restart right after an automatic update**, showing
+  `Failed to load Python DLL`. `start /wait` returns as soon as the setup parent
+  exits, and Inno Setup can re-exec itself, so the app was launched while files
+  were still being written. The updater now waits for the setup process to
+  disappear before starting the app again.
+
 ## [1.5.1] - 2026-11-01
 
 ### Fixed
