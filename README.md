@@ -149,13 +149,37 @@ Click **Setup** and you get a real settings window, not a message box:
 - **Global hotkeys** — click a shortcut and press the combination you want; Esc
   cancels.
 - **Sound** — the slider preview tone and the loud-level warning.
-- **Updates** — check for updates at startup (off by default), plus a **Check for
-  updates** link at the bottom of the main window.
+- **Updates** — a **Check for updates** link at the bottom of the main window, an
+  optional check at startup, and an optional **download and install automatically**
+  switch. Both are off by default; see below for what the updater does.
 - **Startup** — start in the notification area, and close to it.
 
 If you push the slider into a very loud level, the app asks first. That warning
 has a **Don't ask again** switch, and you can turn it back on from
 **Settings → Sound**.
+
+### What the updater does, exactly
+
+Both update switches are **off by default**. When you turn them on:
+
+1. The app asks GitHub for the latest release tag. That is the whole request; it
+   sends nothing about you, not even your version.
+2. If there is a newer version, it downloads `VolumeBoosterSetup.exe` **and**
+   `SHA256SUMS-windows.txt` from that same release, and refuses to run anything
+   whose SHA-256 does not match.
+3. It hands the verified installer to Windows, waits while it installs silently,
+   and starts the app again.
+
+Three rails worth knowing:
+
+- Automatic installation only happens for an **installed** copy. The portable
+  `.exe` is a single loose file and is never replaced behind your back — it just
+  tells you an update exists.
+- A version that failed to install once is **not retried in a loop**; the app tells
+  you instead.
+- Downloading with the app (rather than a browser) means the file carries no
+  Mark-of-the-Web, so SmartScreen does not get a say. That is normal for an
+  updater, and it is also why step 2 exists: the hash is the check.
 
 `%APPDATA%\VolumeBooster\settings.json` can also be edited by hand:
 
@@ -170,6 +194,8 @@ has a **Don't ask again** switch, and you can turn it back on from
 | `hotkey_down` | `Ctrl+Alt+Down` | hotkey | Quieter by 10 %; empty string disables it |
 | `preview_sound` | `true` | bool | Play a tone while moving the slider |
 | `check_updates` | `false` | bool | Check GitHub for a new release at startup |
+| `auto_update` | `false` | bool | Download and install an update when one is found |
+| `update_attempted` | (empty) | version | Set by the app so a failed update is not retried in a loop |
 
 Invalid values are ignored and clamped. A corrupted file never crashes the app —
 it just falls back to the defaults.
@@ -269,7 +295,7 @@ and writes `dist\SHA256SUMS.txt`. On Linux, `./build.sh`.
 ## Tests
 
 ```
-python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report test_hotkey test_winenv test_preview test_update
+python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report test_hotkey test_winenv test_preview test_update test_update_download test_updater
 python app.py --smoke
 python app.py --smoke-ui
 ```

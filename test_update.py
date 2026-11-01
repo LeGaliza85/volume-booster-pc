@@ -8,19 +8,11 @@ from unittest import mock
 import update
 import version
 
-
-class FakeResponse:
-    def __init__(self, payload: bytes) -> None:
-        self._payload = payload
-
-    def read(self) -> bytes:
-        return self._payload
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *_exc):
-        return False
+RELEASE_JSON = (
+    b'{"tag_name": "v9.9.9", "assets": ['
+    b'{"name": "VolumeBoosterSetup.exe", "browser_download_url": "https://x/setup"},'
+    b'{"name": "SHA256SUMS-windows.txt", "browser_download_url": "https://x/sums"}]}'
+)
 
 
 class ParseTests(unittest.TestCase):
@@ -49,44 +41,45 @@ class CompareTests(unittest.TestCase):
         self.assertFalse(update.is_newer("1.3.1", "garbage"))
 
 
-class LatestTagTests(unittest.TestCase):
-    def test_reads_the_tag(self):
-        response = FakeResponse(b'{"tag_name": "v9.9.9"}')
-        with mock.patch("update.urllib.request.urlopen", return_value=response):
-            self.assertEqual(update.latest_tag(), "v9.9.9")
+class LatestReleaseTests(unittest.TestCase):
+    def test_reads_the_tag_and_the_installer_urls(self):
+        with mock.patch.object(update, "_get", return_value=RELEASE_JSON):
+            release = update.latest_release()
+        self.assertEqual(release["tag"], "v9.9.9")
+        self.assertEqual(release["version"], "9.9.9")
+        self.assertEqual(release["setup"], "https://x/setup")
+        self.assertEqual(release["sums"], "https://x/sums")
 
     def test_network_error_is_none(self):
-        with mock.patch("update.urllib.request.urlopen", side_effect=OSError("offline")):
-            self.assertIsNone(update.latest_tag())
+        with mock.patch.object(update, "_get", side_effect=OSError("offline")):
+            self.assertIsNone(update.latest_release())
 
     def test_broken_json_is_none(self):
-        response = FakeResponse(b"not json")
-        with mock.patch("update.urllib.request.urlopen", return_value=response):
-            self.assertIsNone(update.latest_tag())
+        with mock.patch.object(update, "_get", return_value=b"not json"):
+            self.assertIsNone(update.latest_release())
 
     def test_missing_tag_is_none(self):
-        response = FakeResponse(b'{"name": "no tag"}')
-        with mock.patch("update.urllib.request.urlopen", return_value=response):
-            self.assertIsNone(update.latest_tag())
+        with mock.patch.object(update, "_get", return_value=b'{"name": "no tag"}'):
+            self.assertIsNone(update.latest_release())
 
 
 class CheckTests(unittest.TestCase):
     def test_reports_a_newer_release(self):
-        response = FakeResponse(b'{"tag_name": "v99.0.0"}')
-        with mock.patch("update.urllib.request.urlopen", return_value=response):
+        with mock.patch.object(update, "_get", return_value=RELEASE_JSON):
             result = update.check()
         self.assertEqual(result["status"], update.STATUS_NEWER)
-        self.assertEqual(result["latest"], "99.0.0")
+        self.assertEqual(result["latest"], "9.9.9")
         self.assertTrue(result["url"].endswith("/releases/latest"))
+        self.assertEqual(result["setup"], "https://x/setup")
 
     def test_reports_the_current_version(self):
-        response = FakeResponse(f'{{"tag_name": "v{version.VERSION}"}}'.encode())
-        with mock.patch("update.urllib.request.urlopen", return_value=response):
+        payload = f'{{"tag_name": "v{version.VERSION}"}}'.encode()
+        with mock.patch.object(update, "_get", return_value=payload):
             result = update.check()
         self.assertEqual(result["status"], update.STATUS_CURRENT)
 
     def test_offline_is_unknown_not_a_crash(self):
-        with mock.patch("update.urllib.request.urlopen", side_effect=OSError("offline")):
+        with mock.patch.object(update, "_get", side_effect=OSError("offline")):
             result = update.check()
         self.assertEqual(result["status"], update.STATUS_UNKNOWN)
         self.assertEqual(result["latest"], "")

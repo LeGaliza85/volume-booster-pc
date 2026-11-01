@@ -10,6 +10,7 @@ import logging
 import os
 import queue
 import sys
+import tempfile
 import threading
 import time
 import tkinter as tk
@@ -35,6 +36,7 @@ import settingswindow
 import theme as T
 import tray
 import update
+import updater
 import version
 import widgets as W
 
@@ -157,6 +159,8 @@ class AmplifierApp:
         self._last_preview = 0.0
         self._checking_update = False
         self._update_results: queue.Queue = queue.Queue()
+        self._download_results: queue.Queue = queue.Queue()
+        self._updating = False
         self.settings_window: settingswindow.SettingsWindow | None = None
         self.tray: tray.Tray | None = None
 
@@ -174,7 +178,7 @@ class AmplifierApp:
             self.settings["start_hidden"] and not self.first_run and self.tray is not None
         ):
             self.root.withdraw()
-        if self.settings.get("check_updates"):
+        if self.settings.get("check_updates") or self.settings.get("auto_update"):
             self.root.after(3000, lambda: self._check_updates(manual=False))
 
     # ------------------------------------------------------------ i18n
@@ -476,6 +480,9 @@ class AmplifierApp:
             return
         LOG.info("update check: %s available", latest)
         self._set_status(self.t("update_available", version=latest), "warn")
+        if self._can_auto_install(latest):
+            self._auto_install(latest)
+            return
         if not manual:
             if self.tray is not None:
                 self.tray.notify(version.APP_NAME, self.t("update_available", version=latest))
@@ -484,6 +491,54 @@ class AmplifierApp:
             self.t("update_title"), self.t("update_available", version=latest)
         ):
             webbrowser.open(result.get("url") or update.RELEASES_URL)
+
+    def _can_auto_install(self, latest: str) -> bool:
+        """Automatic installation needs the switch, an installed build, and no loop."""
+        if not self.settings.get("auto_update") or self._updating:
+            return False
+        if latest and latest == self.settings.get("update_attempted"):
+            LOG.info("auto update: %s already attempted, not retrying", latest)
+            return False
+        if not updater.installed_build():
+            LOG.info("auto update: portable build, only notifying")
+            return False
+        return True
+
+    def _auto_install(self, latest: str) -> None:
+        self._updating = True
+        self.settings["update_attempted"] = latest
+        self.save_settings()
+        LOG.info("auto update: downloading %s", latest)
+        self._set_status(self.t("updating", version=latest), "warn")
+        if self.tray is not None:
+            self.tray.notify(version.APP_NAME, self.t("updating", version=latest))
+        threading.Thread(target=self._download_worker, daemon=True).start()
+        self.root.after(300, self._poll_download)
+
+    def _download_worker(self) -> None:
+        target = Path(tempfile.gettempdir()) / update.SETUP_NAME
+        self._download_results.put(update.download_installer(target))
+
+    def _poll_download(self) -> None:
+        try:
+            path = self._download_results.get_nowait()
+        except queue.Empty:
+            self.root.after(300, self._poll_download)
+            return
+        self._updating = False
+        if path is None:
+            LOG.warning("auto update: download or checksum failed")
+            self._set_status(self.t("update_install_failed"), "error")
+            if self.tray is not None:
+                self.tray.notify(version.APP_NAME, self.t("update_install_failed"))
+            updater.cleanup()
+            return
+        LOG.info("auto update: verified, handing over to the installer")
+        if updater.launch(path, Path(sys.executable)):
+            self.quit()
+            return
+        LOG.warning("auto update: could not start the installer")
+        self._set_status(self.t("update_install_failed"), "error")
 
     # ------------------------------------------------------------ tray / hotkeys
     def _start_tray(self) -> None:

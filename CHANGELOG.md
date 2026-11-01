@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5.0] - 2026-11-01
+
+### Added
+
+- **Automatic updates**, opt-in. With *Download and install updates automatically*
+  on, the app checks at startup, downloads `VolumeBoosterSetup.exe` and its
+  `SHA256SUMS-windows.txt` from the same release, verifies the hash, hands the
+  installer to Windows, waits while it installs silently and starts again.
+- Three rails: it only self-installs from an **installed** copy (the portable
+  `.exe` is never replaced behind your back), a version that failed once is not
+  retried in a loop, and nothing is executed when the hash does not match.
+
+### Changed
+
+- `check_updates` now only decides whether to look; the new `auto_update` decides
+  whether to install. Both are off by default.
+
 ## [1.4.2] - 2026-11-01
 
 ### Fixed

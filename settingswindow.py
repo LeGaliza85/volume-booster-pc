@@ -74,6 +74,7 @@ class SettingsWindow:
 
         self._section(self.app.t("updates_section"))
         self._toggle_row("check_updates", self.app.t("check_updates"))
+        self._toggle_row("auto_update", self.app.t("auto_update"))
 
         self._section(self.app.t("start_section"))
         self._toggle_row("start_hidden", self.app.t("start_hidden"))

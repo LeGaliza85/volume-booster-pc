@@ -22,6 +22,8 @@ DEFAULTS: dict = {
     "hotkey_down": "Ctrl+Alt+Down",
     "preview_sound": True,
     "check_updates": False,
+    "auto_update": False,
+    "update_attempted": "",
 }
 
 LIMITS: dict[str, tuple[int, int]] = {
@@ -29,7 +31,7 @@ LIMITS: dict[str, tuple[int, int]] = {
     "confirm_above": (0, 1000),
 }
 
-BOOLEANS = ("restore_on_exit", "start_hidden", "close_to_tray", "preview_sound", "check_updates")
+BOOLEANS = ("restore_on_exit", "start_hidden", "close_to_tray", "preview_sound", "check_updates", "auto_update")
 HOTKEYS = ("hotkey_up", "hotkey_down")
 
 
@@ -61,6 +63,12 @@ def sanitize(raw: object) -> dict:
             data[key] = ""
         elif isinstance(value, str) and hotkey.is_valid(value):
             data[key] = hotkey.normalise(value)
+
+    attempted = raw.get("update_attempted")
+    if isinstance(attempted, str) and len(attempted) <= 20 and all(
+        character.isdigit() or character == "." for character in attempted
+    ):
+        data["update_attempted"] = attempted
 
     data["confirm_above"] = min(data["confirm_above"], data["max_percent"])
     return data
