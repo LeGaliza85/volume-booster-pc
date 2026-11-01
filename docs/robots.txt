@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://legaliza85.github.io/volume-booster-pc/sitemap.xml
