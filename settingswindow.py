@@ -84,6 +84,9 @@ class SettingsWindow:
         self._toggle_row("preview_sound", self.app.t("preview_sound"))
         self._warn_row()
 
+        self._section(self.app.t("limits_section"))
+        self._max_row()
+
         self._section(self.app.t("updates_section"))
         self._toggle_row("check_updates", self.app.t("check_updates"))
         self._toggle_row("auto_update", self.app.t("auto_update"))
@@ -162,6 +165,49 @@ class SettingsWindow:
         default = int(settings.DEFAULTS["confirm_above"])
         self.app.settings["confirm_above"] = default if value else 0
         self.app.save_settings()
+
+    def _max_row(self) -> None:
+        row = tk.Frame(self.top, bg=T.BG)
+        row.pack(fill="x", padx=22, pady=3)
+        tk.Label(
+            row,
+            text=self.app.t("max_boost"),
+            bg=T.BG,
+            fg=T.TEXT,
+            font=(self.app.family, T.px(10)),
+            anchor="w",
+        ).pack(side="left")
+        entry = tk.Entry(
+            row,
+            width=6,
+            justify="center",
+            bg=T.SURFACE,
+            fg=T.TEXT,
+            insertbackground=T.TEXT,
+            relief="flat",
+            bd=0,
+            highlightthickness=1,
+            highlightbackground=T.BORDER,
+            highlightcolor=T.ACCENT,
+            font=(self.app.family, T.px(10)),
+        )
+        entry.insert(0, str(self.app.settings["max_percent"]))
+        entry.pack(side="right", ipady=4)
+        entry.bind("<Return>", lambda _event: self._set_max(entry))
+        entry.bind("<FocusOut>", lambda _event: self._set_max(entry))
+        tk.Label(
+            row, text="%", bg=T.BG, fg=T.MUTED, font=(self.app.family, T.px(10))
+        ).pack(side="right", padx=(0, 6))
+
+    def _set_max(self, entry: tk.Entry) -> None:
+        try:
+            raw: object = int(float(entry.get().replace(",", ".")))
+        except (AttributeError, TypeError, ValueError):
+            raw = self.app.settings["max_percent"]
+        value = settings.sanitize({**self.app.settings, "max_percent": raw})["max_percent"]
+        value = self.app.set_max_percent(value)
+        entry.delete(0, "end")
+        entry.insert(0, str(value))
 
     def _on_field_click(self, key: str, _event) -> None:
         self._start_capture(key)

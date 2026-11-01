@@ -272,13 +272,14 @@ class AmplifierApp:
         hints = tk.Frame(frame, bg=T.BG)
         hints.pack(fill="x")
         tk.Label(hints, text="0", bg=T.BG, fg=T.MUTED, font=(self.family, T.px(8))).pack(side="left")
-        tk.Label(
+        self.max_hint = tk.Label(
             hints,
             text=str(self.settings["max_percent"]),
             bg=T.BG,
             fg=T.MUTED,
             font=(self.family, T.px(8)),
-        ).pack(side="right")
+        )
+        self.max_hint.pack(side="right")
 
         exact = tk.Frame(frame, bg=T.BG)
         exact.pack(fill="x", pady=(16, 0))
@@ -677,6 +678,26 @@ class AmplifierApp:
         settings.save(SETTINGS_PATH, self.settings)
         self.settings = settings.load(SETTINGS_PATH)
 
+    def set_max_percent(self, value: int) -> int:
+        """Change the slider ceiling without rebuilding the window.
+
+        A rebuild would destroy the settings window too, because Toplevels are
+        children of the root, so the slider and its hint are patched in place.
+        """
+        self.settings["max_percent"] = int(value)
+        self.save_settings()
+        ceiling = int(self.settings["max_percent"])
+        self.slider.maximum = ceiling
+        with contextlib.suppress(AttributeError, tk.TclError):
+            self.max_hint.configure(text=str(ceiling))
+        if self.percent > ceiling:
+            self.entry_var.set(str(ceiling))
+            self._apply()
+        else:
+            self.slider.set_value(self.percent)
+        LOG.info("max_percent set to %s", ceiling)
+        return ceiling
+
     def _rebuild(self) -> None:
         for child in self.root.winfo_children():
             child.destroy()
@@ -753,7 +774,7 @@ class AmplifierApp:
             number = round(float(raw))
         except (TypeError, ValueError, OverflowError):
             self._refresh(self.percent)
-            self._set_status(self.t("bad_number"), "warn")
+            self._set_status(self.t("bad_number", max=self.settings["max_percent"]), "warn")
             return
 
         value = max(0, min(self.settings["max_percent"], gainmath.clamp_percent(number)))

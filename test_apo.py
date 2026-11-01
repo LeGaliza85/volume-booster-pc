@@ -42,7 +42,9 @@ class PercentMathTests(unittest.TestCase):
 
     def test_clamp(self):
         self.assertEqual(gainmath.clamp_percent(-20), 0)
-        self.assertEqual(gainmath.clamp_percent(900), 500)
+        self.assertEqual(gainmath.clamp_percent(900), 900)
+        self.assertEqual(gainmath.clamp_percent(1000), 1000)
+        self.assertEqual(gainmath.clamp_percent(1500), 1000)
         self.assertEqual(gainmath.clamp_percent("250"), 250)
         self.assertEqual(gainmath.clamp_percent("nonsense"), gainmath.DEFAULT_PERCENT)
 

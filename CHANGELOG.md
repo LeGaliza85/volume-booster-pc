@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5.6] - 2026-11-01
+
+### Fixed
+
+- **The 1000 % range did not exist.** `gainmath.MAX_PERCENT` capped every value
+  at 500, so neither the slider nor `settings.json` could go past it, while the
+  README and the settings table both promised 1000 %. The limit now allows 1000 %.
+- The invalid-value message hardcoded 500; it now uses the configured ceiling.
+
+### Added
+
+- **Settings -> Limits**: the slider ceiling is editable (100-1000 %) without
+  touching JSON, and the slider updates in place when it changes.
+
 ## [1.5.5] - 2026-11-01
 
 ### Fixed

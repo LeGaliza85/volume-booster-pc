@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 
 MIN_PERCENT = 0
-MAX_PERCENT = 500
+MAX_PERCENT = 1000
 DEFAULT_PERCENT = 100
 SILENT_DB = -100.0
 
@@ -21,7 +21,7 @@ def clamp_percent(value: object) -> int:
 
 
 def percent_to_db(percent: float) -> float:
-    """Linear gain as dB. 100 % -> 0 dB, 500 % -> +13.98 dB, 0 % -> silence."""
+    """Linear gain as dB. 100 % -> 0 dB, 500 % -> +13.98 dB, 1000 % -> +20 dB."""
     value = float(percent)
     if value <= 0:
         return SILENT_DB

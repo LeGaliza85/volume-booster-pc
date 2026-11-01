@@ -39,7 +39,8 @@ music at the volume you want:** also 0 €.
   before any `Device:` block, so speakers, headphones and virtual outputs all get
   the same treatment.
 - **0 % to 500 %** with a continuous slider, plus an exact-number box for people
-  who know what they want.
+  who know what they want. The ceiling is yours: **Settings → Limits** raises it to
+  1000 % if you really want +20 dB.
 - **Listen before you commit.** A **Test** button plays a short tone through the
   current chain, and moving the slider plays a tone at the level you are pointing
   to — so you hear the difference instead of guessing. The preview can be turned
@@ -149,6 +150,8 @@ Click **Setup** and you get a real settings window, not a message box:
 - **Global hotkeys** — click a shortcut and press the combination you want; Esc
   cancels.
 - **Sound** — the slider preview tone and the loud-level warning.
+- **Limits** — the slider ceiling, 100 % to **1000 %**. This is how you go past
+  500 %: type the number and press Enter, and the slider stops at the new ceiling.
 - **Updates** — a **Check for updates** link at the bottom of the main window, an
   optional check at startup, and an optional **download and install automatically**
   switch. Both are off by default; see below for what the updater does.
