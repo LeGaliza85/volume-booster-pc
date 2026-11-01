@@ -63,12 +63,31 @@ class FileTests(unittest.TestCase):
     def test_round_trip(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "settings.json"
-            settings.save(path, {"max_percent": 800, "confirm_above": 400, "restore_on_exit": True})
-            self.assertEqual(
-                settings.load(path),
-                {"max_percent": 800, "confirm_above": 400, "restore_on_exit": True},
-            )
+            stored = {"max_percent": 800, "confirm_above": 400, "restore_on_exit": True}
+            settings.save(path, stored)
+            loaded = settings.load(path)
+            self.assertEqual(loaded["max_percent"], 800)
+            self.assertEqual(loaded["confirm_above"], 400)
+            self.assertTrue(loaded["restore_on_exit"])
+            self.assertEqual(set(loaded), set(settings.DEFAULTS))
             self.assertEqual(json.loads(path.read_text(encoding="utf-8"))["max_percent"], 800)
+
+    def test_hotkeys_are_normalised(self):
+        data = settings.sanitize({"hotkey_up": "alt+ctrl+up", "hotkey_down": "Shift+F5"})
+        self.assertEqual(data["hotkey_up"], "Ctrl+Alt+Up")
+        self.assertEqual(data["hotkey_down"], "Shift+F5")
+
+    def test_invalid_hotkey_falls_back_to_the_default(self):
+        data = settings.sanitize({"hotkey_up": "nonsense"})
+        self.assertEqual(data["hotkey_up"], settings.DEFAULTS["hotkey_up"])
+
+    def test_empty_hotkey_is_a_deliberate_no_hotkey(self):
+        data = settings.sanitize({"hotkey_down": ""})
+        self.assertEqual(data["hotkey_down"], "")
+
+    def test_hotkey_that_is_not_a_string_is_ignored(self):
+        data = settings.sanitize({"hotkey_up": 42})
+        self.assertEqual(data["hotkey_up"], settings.DEFAULTS["hotkey_up"])
 
     def test_bom_is_tolerated(self):
         with tempfile.TemporaryDirectory() as tmp:

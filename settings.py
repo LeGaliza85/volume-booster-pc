@@ -10,16 +10,25 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import hotkey
+
 DEFAULTS: dict = {
     "max_percent": 500,
     "confirm_above": 300,
     "restore_on_exit": False,
+    "start_hidden": True,
+    "close_to_tray": True,
+    "hotkey_up": "Ctrl+Alt+Up",
+    "hotkey_down": "Ctrl+Alt+Down",
 }
 
 LIMITS: dict[str, tuple[int, int]] = {
     "max_percent": (100, 1000),
     "confirm_above": (0, 1000),
 }
+
+BOOLEANS = ("restore_on_exit", "start_hidden", "close_to_tray")
+HOTKEYS = ("hotkey_up", "hotkey_down")
 
 
 def sanitize(raw: object) -> dict:
@@ -36,8 +45,20 @@ def sanitize(raw: object) -> dict:
             continue
         data[key] = max(low, min(high, value))
 
-    if isinstance(raw.get("restore_on_exit"), bool):
-        data["restore_on_exit"] = raw["restore_on_exit"]
+    for key in BOOLEANS:
+        if isinstance(raw.get(key), bool):
+            data[key] = raw[key]
+
+    # An empty string is a deliberate "no hotkey"; anything else must parse, or
+    # it falls back to the default instead of silently doing nothing.
+    for key in HOTKEYS:
+        if key not in raw:
+            continue
+        value = raw[key]
+        if value == "":
+            data[key] = ""
+        elif isinstance(value, str) and hotkey.is_valid(value):
+            data[key] = hotkey.normalise(value)
 
     data["confirm_above"] = min(data["confirm_above"], data["max_percent"])
     return data

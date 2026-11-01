@@ -107,16 +107,45 @@ The status bar is the app being honest with you.
 
 ---
 
-## Settings
+## Notification area and hotkeys
 
-`%APPDATA%\VolumeBooster\settings.json` is created on first run and can be edited
-by hand:
+Volume Booster lives in the notification area, next to the clock — it does not take
+a slot in the taskbar.
+
+- **Left-click the icon** to open the window. **Right-click** for Open, Settings,
+  Report a bug and Quit.
+- **Closing the window hides it**, it does not quit. The boost stays applied either
+  way: Equalizer APO keeps it, so nothing is lost while the app is closed.
+- **Global hotkeys**: `Ctrl+Alt+Up` and `Ctrl+Alt+Down` by default, ten percent per
+  press. Change them — or clear them — from **Settings → Global hotkeys**.
+- The very first run shows the window once, so you know where it went. After that
+  it starts hidden.
+
+Everything above is configurable in **Settings**, including whether it starts in
+the notification area at all.
+
+## Settings window
+
+Click **Setup** and you get a real settings window, not a message box:
+
+- **Windows setup** — the four things Windows needs, each with its state and a
+  button that opens the exact place where the fix lives (the Equalizer APO
+  download, the Configurator, or the sound settings for your device). If something
+  is failing, the app tells you here instead of leaving you guessing.
+- **Global hotkeys** — click a shortcut and press the combination you want.
+- **Startup** — start in the notification area, and close to it.
+
+`%APPDATA%\VolumeBooster\settings.json` can also be edited by hand:
 
 | Key | Default | Range | Meaning |
 |---|---|---|---|
 | `max_percent` | `500` | 100–1000 | Slider ceiling |
 | `confirm_above` | `300` | 0–1000 | Ask before jumping above this level; `0` disables the question |
 | `restore_on_exit` | `false` | bool | Set the gain back to 100 % when the app closes |
+| `start_hidden` | `true` | bool | Start in the notification area |
+| `close_to_tray` | `true` | bool | Closing the window hides it instead of quitting |
+| `hotkey_up` | `Ctrl+Alt+Up` | hotkey | Louder by 10 %; empty string disables it |
+| `hotkey_down` | `Ctrl+Alt+Down` | hotkey | Quieter by 10 %; empty string disables it |
 
 Invalid values are ignored and clamped. A corrupted file never crashes the app —
 it just falls back to the defaults.
@@ -158,7 +187,8 @@ VolumeBooster.exe --version
 VolumeBooster.exe --health        # verification state as JSON
 VolumeBooster.exe --settings      # effective settings and their path
 VolumeBooster.exe --diagnostics   # scrubbed support bundle
-VolumeBooster.exe --minimized     # start hidden
+VolumeBooster.exe --report        # the pre-filled bug report URL
+VolumeBooster.exe --minimized     # start hidden in the notification area
 ```
 
 ---
@@ -193,7 +223,7 @@ and writes `dist\SHA256SUMS.txt`. On Linux, `./build.sh`.
 ## Tests
 
 ```
-python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report
+python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report test_hotkey test_winenv
 python app.py --smoke
 python app.py --smoke-ui
 ```

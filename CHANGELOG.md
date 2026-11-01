@@ -4,6 +4,27 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] - 2026-11-01
+
+### Added
+
+- **Notification-area icon**: the app no longer takes a taskbar slot. Left-click
+  opens the window, right-click offers Open, Settings, Report a bug and Quit.
+  Closing the window hides it instead of quitting, and the first run still shows
+  the window once so the icon is not a mystery.
+- **Global hotkeys**: `Ctrl+Alt+Up` and `Ctrl+Alt+Down` raise and lower the boost
+  by ten percent, and they work while the window is hidden.
+- **A real Settings window**: the four Windows requirements with their state and a
+  button that opens the exact place to fix them (APO download, Configurator, sound
+  settings), plus hotkey capture and startup options.
+- `start_hidden`, `close_to_tray`, `hotkey_up` and `hotkey_down` settings; hotkeys
+  are validated on load and an invalid one falls back to the default.
+
+### Fixed
+
+- The tray is optional: if Windows refuses the icon, the window is shown instead of
+  leaving the app invisible.
+
 ## [1.1.0] - 2026-11-01
 
 ### Added

@@ -11,6 +11,7 @@ import os
 import sys
 import tkinter as tk
 import webbrowser
+from collections.abc import Callable
 from ctypes import wintypes
 from pathlib import Path
 from tkinter import font as tkfont
@@ -21,10 +22,13 @@ import backend as backends
 import configfile
 import diagnostics
 import gainmath
+import hotkey
 import i18n
 import report
 import settings
+import settingswindow
 import theme as T
+import tray
 import version
 import widgets as W
 
@@ -36,6 +40,11 @@ CLIP_THRESHOLD = 200
 _MUTEX_NAME = rf"Local\{version.APP_ID}SingleInstance"
 _ERROR_ALREADY_EXISTS = 183
 _MUTEX_HANDLES: list[int] = []
+
+HOTKEY_UP = 1
+HOTKEY_DOWN = 2
+BOOST_STEP = 10
+TRAY_PUMP_MS = 60
 
 
 def resource_path(relative: str) -> Path:
@@ -124,16 +133,20 @@ def apply_dark_titlebar(root: tk.Tk) -> None:
 
 
 class AmplifierApp:
-    def __init__(self, root: tk.Tk, engine, *, minimized: bool = False) -> None:
+    def __init__(self, root: tk.Tk, engine, *, minimized: bool = False, use_tray: bool = True) -> None:
         self.root = root
         self.engine = engine
         self.percent, saved_language = load_state()
         self.language = saved_language or i18n.system_language()
+        self.first_run = not SETTINGS_PATH.exists()
         self.settings = settings.load(SETTINGS_PATH)
         self._applied = self.percent
         self.autostart_enabled = autostart.is_enabled()
         self.family = T.pick_font(root)
         self._dot_colour = T.MUTED
+        self.use_tray = use_tray
+        self.settings_window: settingswindow.SettingsWindow | None = None
+        self.tray: tray.Tray | None = None
 
         self.gain_var = tk.StringVar()
         self.entry_var = tk.StringVar()
@@ -144,7 +157,8 @@ class AmplifierApp:
         self._refresh(self.percent)
         self._apply(silent=True)
         self.root.protocol("WM_DELETE_WINDOW", self._on_close)
-        if minimized:
+        self._start_tray()
+        if minimized or (self.settings["start_hidden"] and not self.first_run and self.tray is not None):
             self.root.withdraw()
 
     # ------------------------------------------------------------ i18n
@@ -381,6 +395,110 @@ class AmplifierApp:
         LOG.info("opening the bug report form")
         webbrowser.open(url)
 
+    # ------------------------------------------------------------ tray / hotkeys
+    def _start_tray(self) -> None:
+        if not self.use_tray:
+            return
+        self.tray = tray.Tray(
+            title=version.APP_NAME,
+            icon_path=str(resource_path("assets/volume-amplifier.ico")),
+            menu=self._tray_menu,
+            on_open=lambda: self._later(self.show_window),
+        )
+        if not self.tray.start():
+            self.tray = None
+            LOG.info("tray unavailable, falling back to the taskbar")
+            return
+        LOG.info("tray icon active")
+        self.root.after(TRAY_PUMP_MS, self._pump_tray)
+        self._sync_hotkeys()
+
+    def _pump_tray(self) -> None:
+        if self.tray is not None:
+            self.tray.pump()
+        self.root.after(TRAY_PUMP_MS, self._pump_tray)
+
+    def _later(self, action: Callable[[], None]) -> None:
+        self.root.after(0, action)
+
+    def _tray_menu(self) -> list[tuple[str, Callable[[], None]]]:
+        return [
+            (self.t("tray_open"), lambda: self._later(self.show_window)),
+            (self.t("setup"), lambda: self._later(self.show_settings)),
+            (self.t("report"), lambda: self._later(self._report_bug)),
+            (self.t("tray_exit"), self.quit),
+        ]
+
+    def show_window(self) -> None:
+        self.root.deiconify()
+        self.root.lift()
+        self.root.focus_force()
+
+    def show_settings(self) -> None:
+        if self.settings_window is not None:
+            self.settings_window.focus()
+            return
+        self.settings_window = settingswindow.SettingsWindow(self)
+
+    def _sync_hotkeys(self) -> bool:
+        """(Re)register both hotkeys. False means Windows refused one of them."""
+        if self.tray is None:
+            return True
+        self.tray.unregister_hotkey(HOTKEY_UP)
+        self.tray.unregister_hotkey(HOTKEY_DOWN)
+        accepted = True
+        for ident, name, action in (
+            (HOTKEY_UP, "hotkey_up", self._boost_up),
+            (HOTKEY_DOWN, "hotkey_down", self._boost_down),
+        ):
+            parsed = hotkey.parse(self.settings.get(name, ""))
+            if parsed is None:
+                continue
+            if not self.tray.register_hotkey(ident, parsed[0], parsed[1], action):
+                accepted = False
+                LOG.warning("hotkey refused by Windows: %s", self.settings.get(name))
+            else:
+                LOG.info("hotkey registered: %s", self.settings.get(name))
+        return accepted
+
+    def set_hotkey(self, name: str, combination: str) -> bool:
+        if combination and not hotkey.is_valid(combination):
+            return False
+        previous = self.settings.get(name, "")
+        self.settings[name] = combination
+        self.save_settings()
+        if self._sync_hotkeys():
+            LOG.info("hotkey %s = %s", name, combination or "(none)")
+            return True
+        self.settings[name] = previous
+        self.save_settings()
+        self._sync_hotkeys()
+        return False
+
+    def suspend_hotkeys(self) -> None:
+        if self.tray is not None:
+            self.tray.unregister_hotkey(HOTKEY_UP)
+            self.tray.unregister_hotkey(HOTKEY_DOWN)
+
+    def resume_hotkeys(self) -> None:
+        self._sync_hotkeys()
+
+    def _boost_up(self) -> None:
+        self._nudge_boost(BOOST_STEP)
+
+    def _boost_down(self) -> None:
+        self._nudge_boost(-BOOST_STEP)
+
+    def _nudge_boost(self, delta: int) -> None:
+        low = gainmath.MIN_PERCENT
+        high = int(self.settings["max_percent"])
+        self.entry_var.set(str(max(low, min(high, self.percent + delta))))
+        self._apply()
+
+    def save_settings(self) -> None:
+        settings.save(SETTINGS_PATH, self.settings)
+        self.settings = settings.load(SETTINGS_PATH)
+
     def _rebuild(self) -> None:
         for child in self.root.winfo_children():
             child.destroy()
@@ -467,7 +585,7 @@ class AmplifierApp:
         gain = self.t("muted") if value == 0 else gainmath.format_db(
             gainmath.percent_to_db(value)
         )
-        state = self._health()
+        state = self.health()
         if state["level"] == "detached":
             self._set_status(self.t("detached"), "error")
         elif state["level"] == "drift":
@@ -475,7 +593,7 @@ class AmplifierApp:
         else:
             self._set_status(self.t("applied", gain=gain, engine=self.engine.engine), "ok")
 
-    def _health(self) -> dict:
+    def health(self) -> dict:
         return engine_health(self.engine, self.percent)
 
     def _set_status(self, text: str, kind: str) -> None:
@@ -489,11 +607,16 @@ class AmplifierApp:
         self.dot.create_oval(1, 1, 9, 9, fill=self._dot_colour, outline="")
 
     def _show_setup(self) -> None:
-        messagebox.showinfo(
-            self.t("setup"), self.t(self.engine.help_key, location=self.engine.location())
-        )
+        self.show_settings()
 
     def _on_close(self) -> None:
+        if self.tray is not None and self.settings.get("close_to_tray"):
+            self.root.withdraw()
+            LOG.info("hidden to the notification area")
+            return
+        self.quit()
+
+    def quit(self) -> None:
         save_state(self.percent, self.language)
         if self.settings.get("restore_on_exit") and self._applied != gainmath.DEFAULT_PERCENT:
             try:
@@ -501,6 +624,9 @@ class AmplifierApp:
                 LOG.info("restored 100%% on exit")
             except (backends.BackendError, OSError) as exc:
                 LOG.warning("restore on exit failed: %s", exc)
+        if self.tray is not None:
+            self.tray.stop()
+            self.tray = None
         self.root.destroy()
 
 
@@ -558,7 +684,7 @@ def _smoke_ui() -> int:
         root = tk.Tk()
         root.withdraw()
         try:
-            window = AmplifierApp(root, backends.detect())
+            window = AmplifierApp(root, backends.detect(), use_tray=False)
             root.update()
 
             window.slider.set_value(500, notify=True)
