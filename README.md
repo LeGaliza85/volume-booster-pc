@@ -49,7 +49,10 @@ music at the volume you want:** also 0 €.
 - **Zero added latency.** It does not capture, buffer or replay audio — Equalizer
   APO applies the gain in the existing path.
 - **Nine languages**, chosen automatically from your system language.
-- **One small window.** No tray bloat, no background service, no driver.
+- **Lives next to the clock.** One small window and a tray icon; no background
+  service, no driver, nothing running that you did not ask for.
+- **Tells you about new releases when you ask.** A *Check for updates* link, plus
+  an optional check at startup that is off by default.
 
 ### What it deliberately does not do
 
@@ -137,10 +140,12 @@ Click **Setup** and you get a real settings window, not a message box:
 - **Windows setup** — only what actually needs attention. With Equalizer APO
   missing you get one red row and a **Download** button; once it is installed that
   row disappears. With the APO attached, the row offers **Change** to open the
-  Configurator and pick other devices. The Enhancements row carries an **Open
-  Sound** button and the exact click path, because Windows has no way to open one
-  device's properties page directly. The reboot hint only appears while the APO is
-  not attached yet.
+  Configurator and pick other devices. If Windows has *Disable all enhancements*
+  ticked on that device, a red row says so and names it — Windows stores that flag
+  per endpoint, so the row disappears on its own once you untick it. The button
+  opens the Sound panel and the row carries the click path, because Windows has no
+  way to open one device's properties page directly. The reboot hint only appears
+  while the APO is not attached yet.
 - **Global hotkeys** — click a shortcut and press the combination you want; Esc
   cancels.
 - **Sound** — the slider preview tone and the loud-level warning.
