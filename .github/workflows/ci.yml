@@ -24,7 +24,10 @@ jobs:
         run: python -m pip install --disable-pip-version-check ruff mypy
       - name: Lint
         run: ruff check .
+      # winreg and ctypes.windll only exist in typeshed on Windows, so a Linux
+      # mypy run reports them as missing attributes instead of checking the code.
       - name: Types
+        if: runner.os == 'Windows'
         run: mypy
       - name: Tests
         run: >
