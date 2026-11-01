@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.2] - 2026-11-01
+
+### Fixed
+
+- The notification-area icon is put back when Explorer restarts. Windows drops
+  every icon in that case, and a hidden app with no icon has no way back.
+- The tray message pump can no longer stop itself: a failure is logged and the
+  loop keeps running, instead of the icon going deaf for the rest of the session.
+
+### Added
+
+- `crash.log` records a native crash with its Python stack (faulthandler), and
+  `--diagnostics` includes it. A failed Win32 call can kill the process without
+  raising anything Python can catch, which used to leave no evidence at all.
+
 ## [1.2.1] - 2026-11-01
 
 ### Added

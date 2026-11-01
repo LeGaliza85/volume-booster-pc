@@ -113,7 +113,7 @@ Volume Booster lives in the notification area, next to the clock — it does not
 a slot in the taskbar.
 
 - **Left-click the icon** to open the window. **Right-click** for Open, Settings,
-  Report a bug and Quit.
+  Report a bug and Quit. If Explorer restarts, the icon comes back on its own.
 - **Closing the window hides it**, it does not quit. The boost stays applied either
   way: Equalizer APO keeps it, so nothing is lost while the app is closed.
 - **Global hotkeys**: `Ctrl+Alt+Up` and `Ctrl+Alt+Down` by default, ten percent per
@@ -195,7 +195,8 @@ which is the one thing it is not allowed to be.
   endings. The original config is backed up once before the first change.
 - **Fail closed.** A config with unbalanced markers is refused, never guessed at.
 - **`--diagnostics`** writes a support bundle with your user name and home path
-  replaced by `<user>` / `<home>`.
+  replaced by `<user>` / `<home>`. It also carries `crash.log`, which only
+  has content if the process died on a native call.
 
 ---
 

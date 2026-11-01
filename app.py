@@ -417,9 +417,13 @@ class AmplifierApp:
         self._sync_hotkeys()
 
     def _pump_tray(self) -> None:
-        if self.tray is not None:
-            self.tray.pump()
-        self.root.after(TRAY_PUMP_MS, self._pump_tray)
+        try:
+            if self.tray is not None:
+                self.tray.pump()
+        except Exception:
+            LOG.exception("tray pump failed")
+        finally:
+            self.root.after(TRAY_PUMP_MS, self._pump_tray)
 
     def _later(self, action: Callable[[], None]) -> None:
         self.root.after(0, action)
@@ -519,8 +523,11 @@ class AmplifierApp:
         self._toast_job = None
         if self.tray is None:
             return
-        if not self.tray.notify(version.APP_NAME, self._level_text()):
-            LOG.info("level toast not shown")
+        try:
+            if not self.tray.notify(version.APP_NAME, self._level_text()):
+                LOG.info("level toast not shown")
+        except Exception:
+            LOG.exception("level toast failed")
 
     def save_settings(self) -> None:
         settings.save(SETTINGS_PATH, self.settings)

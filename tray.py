@@ -151,6 +151,8 @@ def _libraries():
         user32.UnregisterHotKey.argtypes = (wintypes.HWND, ctypes.c_int)
         shell32.Shell_NotifyIconW.argtypes = (wintypes.DWORD, ctypes.POINTER(NOTIFYICONDATAW))
         kernel32.GetModuleHandleW.restype = wintypes.HMODULE
+        user32.RegisterWindowMessageW.restype = wintypes.UINT
+        user32.RegisterWindowMessageW.argtypes = (wintypes.LPCWSTR,)
         _libraries_ready = True
     return user32, shell32, kernel32
 
@@ -176,6 +178,7 @@ class Tray:
         self._proc: object | None = None
         self._class_name = ""
         self._pending_menu = False
+        self._taskbar_created = 0
         self._hotkeys: dict[int, Callable[[], None]] = {}
         self._active = False
 
@@ -186,7 +189,7 @@ class Tray:
         if not sys.platform.startswith("win"):
             return False
         try:
-            user32, shell32, kernel32 = _libraries()
+            user32, _shell32, kernel32 = _libraries()
             self._class_name = f"VolumeBoosterTray{id(self)}"
             self._proc = WNDPROC(self._wnd_proc)
             window_class = WNDCLASSW()
@@ -206,22 +209,35 @@ class Tray:
             self._icon = user32.LoadImageW(
                 None, self.icon_path, IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE
             )
+            if not self._add_icon():
+                self._teardown()
+                return False
+            self._taskbar_created = user32.RegisterWindowMessageW("TaskbarCreated")
+            self._active = True
+            return True
+        except (AttributeError, OSError, ValueError):
+            self._teardown()
+            return False
+
+    def _add_icon(self) -> bool:
+        """Add the icon (again after an Explorer restart). False when refused."""
+        if self._hwnd is None:
+            return False
+        try:
+            _user32, shell32, _kernel32 = _libraries()
             notice = NOTIFYICONDATAW()
             notice.cbSize = ctypes.sizeof(NOTIFYICONDATAW)
-            notice.hWnd = hwnd
+            notice.hWnd = self._hwnd
             notice.uID = 1
             notice.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP
             notice.uCallbackMessage = _CALLBACK
             notice.hIcon = self._icon
             notice.szTip = self.title[:_TIP_LIMIT]
             if not shell32.Shell_NotifyIconW(NIM_ADD, ctypes.byref(notice)):
-                self._teardown()
                 return False
             self._nid = notice
-            self._active = True
             return True
-        except (AttributeError, OSError, ValueError):
-            self._teardown()
+        except (AttributeError, OSError):
             return False
 
     def stop(self) -> None:
@@ -362,6 +378,10 @@ class Tray:
 
     # ----------------------------------------------------------------- wndproc
     def _wnd_proc(self, hwnd, message, wparam, lparam):
+        if self._taskbar_created and message == self._taskbar_created:
+            # Explorer restarted: every icon was lost with it.
+            self._add_icon()
+            return 0
         if message == _CALLBACK:
             event = int(lparam) & 0xFFFF
             if event in (WM_LBUTTONUP, WM_LBUTTONDBLCLK):

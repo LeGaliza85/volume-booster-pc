@@ -6,6 +6,8 @@ user can attach to an issue, containing a scrubbed report and the recent log.
 
 from __future__ import annotations
 
+import contextlib
+import faulthandler
 import json
 import logging
 import os
@@ -41,6 +43,31 @@ def log_path() -> Path:
     return log_dir() / LOG_NAME
 
 
+def crash_log_path() -> Path:
+    return log_dir() / "crash.log"
+
+
+_CRASH_HANDLES: list = []
+
+
+def enable_crash_log() -> Path | None:
+    """Record a native crash (an access violation in ctypes) with its Python stack.
+
+    A failed Win32 call can kill the process without raising anything Python can
+    catch, which leaves no evidence at all. faulthandler writes the stack at the
+    moment of the fault.
+    """
+    target = crash_log_path()
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        handle = open(target, "w", encoding="utf-8")  # noqa: SIM115 - faulthandler owns it
+    except OSError:
+        return None
+    _CRASH_HANDLES.append(handle)
+    faulthandler.enable(file=handle, all_threads=True)
+    return target
+
+
 def configure(root=None) -> Path:
     """Rotating file log plus hooks for unhandled and Tk-callback exceptions."""
     target = log_path()
@@ -59,6 +86,7 @@ def configure(root=None) -> Path:
         logging.getLogger("crash").exception("unhandled", exc_info=(exc_type, exc_value, exc_tb))
 
     sys.excepthook = _hook
+    enable_crash_log()
     if root is not None:
         def _tk_hook(exc_type, exc_value, exc_tb):
             logging.getLogger("tk").exception(
@@ -144,4 +172,8 @@ def export(extra: dict | None = None, destination: Path | None = None) -> Path:
         tail = log_tail()
         if tail:
             bundle.writestr("app.log", tail)
+        crash = crash_log_path()
+        if crash.exists():
+            with contextlib.suppress(OSError):
+                bundle.writestr("crash.log", crash.read_text(encoding="utf-8", errors="replace"))
     return target

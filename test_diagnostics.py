@@ -46,6 +46,12 @@ class BlockTests(unittest.TestCase):
         self.assertEqual(diagnostics.text_block("Filter: ON PK Fc 80 Hz"), "")
 
 
+class CrashLogTests(unittest.TestCase):
+    def test_crash_log_sits_next_to_the_app_log(self):
+        self.assertEqual(diagnostics.crash_log_path().name, "crash.log")
+        self.assertEqual(diagnostics.crash_log_path().parent, diagnostics.log_path().parent)
+
+
 class ReportTests(unittest.TestCase):
     def test_report_identity_and_scrubbing(self):
         report = diagnostics.build_report({"state": {"percent": 320, "language": "es"}})
