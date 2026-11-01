@@ -15,6 +15,7 @@ from tkinter import messagebox
 import hotkey
 import settings
 import theme as T
+import version
 import widgets as W
 import winenv
 
@@ -50,6 +51,17 @@ class SettingsWindow:
         ).pack(fill="x", padx=22, pady=((10, 4) if first else (14, 4)))
 
     def _build(self) -> None:
+        # The only place the version is visible in the UI. After an automatic
+        # update it is how you check which build you ended up on.
+        tk.Label(
+            self.top,
+            text=f"{version.APP_NAME} {version.VERSION}",
+            bg=T.BG,
+            fg=T.MUTED,
+            font=(self.app.family, T.px(8)),
+            anchor="w",
+        ).pack(fill="x", padx=22, pady=(12, 0))
+
         self._section(self.app.t("windows_section"), first=True)
         self._requirements.pack(fill="x")
 

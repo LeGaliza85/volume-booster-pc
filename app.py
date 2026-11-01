@@ -998,8 +998,19 @@ def _diagnostics() -> int:
     return 0
 
 
+def _clean_update_leftover() -> None:
+    """Delete the installer the updater left in temp.
+
+    After a successful update this file is stale, and after a failed one it is
+    14 MB of nothing. Nothing else writes that name.
+    """
+    with contextlib.suppress(OSError):
+        Path(tempfile.gettempdir(), update.SETUP_NAME).unlink()
+
+
 def main() -> int:
     arguments = set(sys.argv[1:])
+    _clean_update_leftover()
     if "--version" in arguments:
         print(f"{version.APP_NAME} {version.VERSION}")
         print(f"by {version.AUTHOR} - {version.REPOSITORY}")

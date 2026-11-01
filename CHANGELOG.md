@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5.4] - 2026-11-01
+
+### Added
+
+- The settings window now shows the running version under its title, which is the
+  only way to tell which build an automatic update actually landed on.
+
+### Fixed
+
+- The downloaded installer was left in %TEMP% after every update (14 MB). The next
+  start removes it.
+
 ## [1.5.3] - 2026-11-01
 
 ### Fixed
