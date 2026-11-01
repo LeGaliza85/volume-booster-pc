@@ -14,6 +14,18 @@ Free, open source, provided as is, without warranty of any kind.
 See LICENSE for the full text.
 
 
+Please keep it free
+
+This project is free, and I would like it to stay that way.
+
+Please do not sell it, and please do not build a paid product around it. If you
+use it in a project, a video, a school or a tool of your own, a credit to
+LeGaliza85 is appreciated.
+
+This is a request, not a licence term. The MIT licence permits selling and does
+not require credit; what actually applies is the LICENSE file.
+
+
 Aviso - Volume Booster
 
 El audio muy alto puede danar tu oido y tus altavoces.
@@ -28,3 +40,15 @@ este programa o de reproducir audio demasiado alto.
 
 Gratis, codigo abierto y se ofrece tal cual, sin garantia de ningun tipo.
 Ver LICENSE para el texto completo.
+
+
+Por favor, mantenlo gratis
+
+Este proyecto es gratis y me gustaria que siguiera siendolo.
+
+Por favor, no lo vendas ni montes un producto de pago con el. Si lo usas en un
+proyecto, un video, un centro educativo o una herramienta tuya, se agradece el
+credito a LeGaliza85.
+
+Esto es una peticion, no una condicion de la licencia. La licencia MIT permite
+venderlo y no exige credito; lo que se aplica de verdad es el fichero LICENSE.

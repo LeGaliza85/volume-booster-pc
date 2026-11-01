@@ -4,6 +4,16 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5.10] - 2026-11-01
+
+### Added
+
+- A visible request, in English and Spanish, that the app is **not sold or used to
+  build a paid product**, plus an ask for credit if it is used in a project. It is
+  written as a request, not a licence term, because the project is MIT and the MIT
+  licence permits both. It appears at the top of the README, in DISCLAIMER.txt`r
+  (shown by the installer and installed with the app) and in the release notes.
+
 ## [1.5.9] - 2026-11-01
 
 ### Added

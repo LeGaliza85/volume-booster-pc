@@ -13,6 +13,16 @@
 > Free, open source, provided **as is**, without warranty of any kind — see
 > [LICENSE](LICENSE) and [DISCLAIMER.txt](DISCLAIMER.txt).
 
+> ## 🤝 Free to use — please keep it that way
+>
+> **Please do not sell it, and please do not build a paid product around it.**
+> If you use it in a project, a video, a school or a tool of your own, **a credit
+> to LeGaliza85 is appreciated.**
+>
+> This is a request, not a licence term: the MIT licence permits selling and does
+> not require credit, and I would rather say that plainly than pretend otherwise.
+> What actually applies is [LICENSE](LICENSE).
+
 [![ci](https://github.com/LeGaliza85/volume-booster-pc/actions/workflows/ci.yml/badge.svg)](https://github.com/LeGaliza85/volume-booster-pc/actions/workflows/ci.yml)
 
 **A free, open-source volume booster for PC that raises Windows audio above the
@@ -346,6 +356,16 @@ skip elsewhere.
 >
 > Gratis, código abierto y se ofrece **tal cual**, sin garantía de ningún tipo —
 > ver [LICENSE](LICENSE) y [DISCLAIMER.txt](DISCLAIMER.txt).
+
+> ## 🤝 Gratis para usar — por favor, que siga siéndolo
+>
+> **Por favor, no lo vendas ni montes un producto de pago con él.** Si lo usas en
+> un proyecto, un vídeo, un centro educativo o una herramienta tuya, **se agradece
+> el crédito a LeGaliza85.**
+>
+> Esto es una petición, no una condición de la licencia: la MIT permite venderlo y
+> no exige crédito, y prefiero decirlo claro a fingir lo contrario. Lo que se
+> aplica de verdad es [LICENSE](LICENSE).
 
 **Volume Booster PC** sube el volumen del sistema **por encima del 100 %**, hasta
 el 500 % (1000 % si te empeñas), sin añadir latencia y sin telemetría.
