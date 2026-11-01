@@ -33,13 +33,14 @@ def installed_build() -> bool:
 
 
 def script(setup: Path, app: Path, wait: int = WAIT_SECONDS) -> str:
-    """The batch text: wait, install silently, relaunch, self-delete."""
+    """The batch text: wait, install silently, relaunch, clean up."""
     return "\r\n".join(
         [
             "@echo off",
             f"ping -n {wait + 1} 127.0.0.1 >nul",
             f'start "" /wait "{setup}" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART',
             f'start "" "{app}"',
+            f'del /q "{setup}"',
             'del /q "%~f0"',
             "",
         ]

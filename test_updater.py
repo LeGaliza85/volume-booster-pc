@@ -20,6 +20,7 @@ class ScriptTests(unittest.TestCase):
         self.assertIn("/NORESTART", text)
         self.assertIn('start "" "C:\\Apps\\Volume Booster\\VolumeBooster.exe"', text)
         self.assertIn('del /q "%~f0"', text)
+        self.assertIn('del /q "C:\\Temp\\VolumeBoosterSetup.exe"', text)
 
     def test_it_waits_before_installing(self):
         self.assertIn("ping -n 4", updater.script(Path("a"), Path("b"), wait=3))

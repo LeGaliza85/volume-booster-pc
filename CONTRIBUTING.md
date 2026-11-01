@@ -34,7 +34,9 @@ exercise Equalizer APO) and skip elsewhere.
   guessed at. A broken settings file must fall back to defaults.
 - **No hidden writes.** Anything that touches the user's audio configuration
   gets a backup and an atomic write.
-- **No network.** No telemetry, analytics or auto-updater.
+- **No telemetry, and network access only where it is declared.** The only
+  network code is `update.py` (the release check and, when the user opts in, the
+  installer download). Anything else reaching the network is a regression.
 
 ## Translations
 

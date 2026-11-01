@@ -15,8 +15,32 @@
   file). No administrator rights, no services, no drivers.
 - Stores the last value and the settings under `%APPDATA%\VolumeBooster`
   (`~/.config/volume-booster-pc` on Linux).
-- Sends nothing over the network. There is no telemetry, no updater and no
+- Sends nothing over the network by default. There is no telemetry and no
   analytics.
+
+## Network access and the updater
+
+Two opt-in switches control the only network activity in the app:
+
+- `check_updates` asks `api.github.com` for the latest release tag of this
+  repository. The request carries a user agent with the app name and version and
+  nothing else — no identifiers, no counters, no usage data.
+- `auto_update` additionally downloads `VolumeBoosterSetup.exe` and
+  `SHA256SUMS-windows.txt` **from that same release**, and refuses to run the
+  installer unless its SHA-256 matches the published checksum. A mismatch deletes
+  the file and stops.
+
+Both are off by default. What this means as a threat model, honestly:
+
+- The checksum comes from the same origin as the installer, so it protects against
+  a corrupted or truncated download, **not** against a compromised GitHub release.
+  That is the same trust model as any unsigned updater.
+- The installer runs silently, which means SmartScreen does not get a say: a file
+  written by the app carries no Mark-of-the-Web. Treat a compromise of the release
+  channel as equivalent to running arbitrary code.
+- Automatic installation only happens for an installed build (the one with
+  `unins000.exe` next to it). The portable `.exe` is never replaced.
+- A version that failed to install once is recorded and not retried in a loop.
 
 ## Reporting a vulnerability
 

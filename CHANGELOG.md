@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5.1] - 2026-11-01
+
+### Fixed
+
+- `SECURITY.md` claimed "there is no telemetry, no updater and no analytics" after
+  1.5.0 added one. It now documents the two network switches, what the request
+  carries, and the honest threat model: the checksum protects against a corrupted
+  download, not against a compromised release, and a silently installed file has no
+  Mark-of-the-Web for SmartScreen to judge.
+- `CONTRIBUTING.md` said "no network, no auto-updater"; the rule is now "no
+  telemetry, and network access only where it is declared" — `update.py` and
+  nowhere else.
+- The detached updater deletes the downloaded installer as well as itself, so a
+  successful update leaves no 14 MB file in `%TEMP%`.
+
 ## [1.5.0] - 2026-11-01
 
 ### Added
