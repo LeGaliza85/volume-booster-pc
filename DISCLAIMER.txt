@@ -1,0 +1,30 @@
+Volume Booster - Warning
+
+Loud audio can damage your hearing and your equipment.
+
+This app raises the system volume far beyond what Windows allows, up to 1000 %
+(+20 dB). At that level you can damage your hearing, and you can damage
+speakers, headphones or amplifiers that were never meant to take it.
+
+You decide how much gain to apply. The author is not liable for hearing damage,
+damaged equipment, or any other harm caused by using this software or by playing
+audio too loud.
+
+Free, open source, provided as is, without warranty of any kind.
+See LICENSE for the full text.
+
+
+Aviso - Volume Booster
+
+El audio muy alto puede danar tu oido y tus altavoces.
+
+Esta aplicacion sube el volumen del sistema mucho mas alla de lo que permite
+Windows, hasta el 1000 % (+20 dB). A ese nivel puedes danar tu oido, y tambien
+altavoces, auriculares o amplificadores que no esten preparados.
+
+Tu decides cuanta ganancia aplicar. El autor no se hace responsable de los danos
+auditivos, de los equipos danados ni de ningun otro perjuicio derivado de usar
+este programa o de reproducir audio demasiado alto.
+
+Gratis, codigo abierto y se ofrece tal cual, sin garantia de ningun tipo.
+Ver LICENSE para el texto completo.

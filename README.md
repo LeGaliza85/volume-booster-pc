@@ -1,5 +1,18 @@
 # Volume Booster PC
 
+> ## ⚠️ Loud audio can hurt you, and it can break your equipment
+>
+> This app raises your system volume far beyond what Windows allows: up to
+> **1000 % (+20 dB)**. At that level you can damage your **hearing**, and you can
+> damage **speakers, headphones or amplifiers** that were never meant to take it.
+>
+> You decide how much gain to apply. The author is **not liable** for hearing
+> damage, damaged equipment, or any other harm caused by using this software or by
+> playing audio too loud. The app warns you as you go up; the rest is your call.
+>
+> Free, open source, provided **as is**, without warranty of any kind — see
+> [LICENSE](LICENSE) and [DISCLAIMER.txt](DISCLAIMER.txt).
+
 [![ci](https://github.com/LeGaliza85/volume-booster-pc/actions/workflows/ci.yml/badge.svg)](https://github.com/LeGaliza85/volume-booster-pc/actions/workflows/ci.yml)
 
 **A free, open-source volume booster for PC that raises Windows audio above the
@@ -319,6 +332,20 @@ skip elsewhere.
 ---
 
 ## En español
+
+> ## ⚠️ El audio muy alto puede dañar tu oído y tus altavoces
+>
+> Esta aplicación sube el volumen del sistema mucho más allá de lo que permite
+> Windows: hasta el **1000 % (+20 dB)**. A ese nivel puedes dañar tu **oído**, y
+> también **altavoces, auriculares o amplificadores** que no estén preparados.
+>
+> Tú decides cuánta ganancia aplicar. El autor **no se hace responsable** de los
+> daños auditivos, de los equipos dañados ni de ningún otro perjuicio derivado de
+> usar este programa o de reproducir audio demasiado alto. La app te avisa según
+> subes; el resto es decisión tuya.
+>
+> Gratis, código abierto y se ofrece **tal cual**, sin garantía de ningún tipo —
+> ver [LICENSE](LICENSE) y [DISCLAIMER.txt](DISCLAIMER.txt).
 
 **Volume Booster PC** sube el volumen del sistema **por encima del 100 %**, hasta
 el 500 % (1000 % si te empeñas), sin añadir latencia y sin telemetría.

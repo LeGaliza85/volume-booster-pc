@@ -4,6 +4,17 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5.9] - 2026-11-01
+
+### Added
+
+- **A visible warning about loud audio**, in English and Spanish: at the top of the
+  README, and as DISCLAIMER.txt, which the installer shows before copying
+  anything. It states that up to 1000 % (+20 dB) can damage hearing, speakers,
+  headphones or amplifiers, that the user decides how much gain to apply, and that
+  the author is not liable for any resulting damage. It is also installed next to
+  the app so it can be read later.
+
 ## [1.5.8] - 2026-11-01
 
 ### Fixed
