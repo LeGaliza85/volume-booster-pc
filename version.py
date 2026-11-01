@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-APP_NAME = "BoostAudio"
-APP_ID = "BoostAudio"
+APP_NAME = "Volume Booster"
+APP_ID = "VolumeBooster"
 VERSION = "1.0.0"
 AUTHOR = "LeGaliza85"
 AUTHOR_URL = "https://github.com/LeGaliza85"
-REPOSITORY = "https://github.com/LeGaliza85/boostaudio"
+REPOSITORY = "https://github.com/LeGaliza85/volume-booster-pc"

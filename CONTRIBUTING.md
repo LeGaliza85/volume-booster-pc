@@ -29,7 +29,7 @@ exercise Equalizer APO) and skip elsewhere.
   library only; every dependency is a future broken install.
 - **Never stack gain.** A `Preamp` filter adds to any other one in the same
   audio chain. The app owns exactly one gain source
-  (`boostaudio.txt`) and removes any legacy block.
+  (`volume-booster.txt`) and removes any legacy block.
 - **Fail closed.** A config with unbalanced markers must be refused, never
   guessed at. A broken settings file must fall back to defaults.
 - **No hidden writes.** Anything that touches the user's audio configuration

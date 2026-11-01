@@ -6,9 +6,9 @@ cd "$(dirname "$0")"
 python3 tools/make_icon.py
 
 python3 -m PyInstaller --noconfirm --clean --onefile \
-    --name BoostAudio \
+    --name VolumeBooster \
     --add-data "assets/volume-amplifier.ico:assets" \
     app.py
 
 echo
-echo "Built dist/BoostAudio"
+echo "Built dist/VolumeBooster"

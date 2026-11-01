@@ -35,3 +35,13 @@ def pick_font(root) -> str:
         if name in available:
             return name
     return "TkDefaultFont"
+
+
+def px(points: float) -> int:
+    """Tk font size in whole pixels.
+
+    A negative Tk size means pixels; a positive one means points, which Tk turns
+    into a fractional pixel height (10 pt = 13.33 px) and the rasteriser has to
+    round per glyph. Passing whole pixels keeps stems on the pixel grid.
+    """
+    return -max(1, round(points * 96 / 72))

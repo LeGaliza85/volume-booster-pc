@@ -1,4 +1,4 @@
-"""Equalizer APO config management for the Volume Amplifier app.
+"""Equalizer APO config management for Volume Booster PC.
 
 Windows clamps endpoint volume at 100 %. A signed APO (Equalizer APO) is what
 actually applies digital gain above that ceiling. This module does not reimplement

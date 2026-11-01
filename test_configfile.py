@@ -12,9 +12,9 @@ LEGACY = (
     "# <<< Amplificador Voz <<<\r\n"
 )
 PRO = (
-    "# >>> BoostAudio >>>\r\n"
+    "# >>> Volume Booster >>>\r\n"
     "Preamp: 3.52 dB\r\n"
-    "# <<< BoostAudio <<<\r\n"
+    "# <<< Volume Booster <<<\r\n"
 )
 USER = "Device: Headphones\r\nFilter: ON PK Fc 80 Hz Gain 3 dB Q 1.0\r\n"
 

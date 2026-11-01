@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: >
           python -m PyInstaller --noconfirm --clean --onefile --windowed
-          --name BoostAudio
+          --name VolumeBooster
           --icon assets/volume-amplifier.ico
           --version-file version_info.txt
           --add-data "assets/volume-amplifier.ico;assets"
@@ -28,19 +28,19 @@ jobs:
       - name: Package
         shell: pwsh
         run: |
-          Compress-Archive -LiteralPath dist/BoostAudio.exe, README.md, LICENSE `
-            -DestinationPath dist/BoostAudio-portable.zip -Force
+          Compress-Archive -LiteralPath dist/VolumeBooster.exe, README.md, LICENSE `
+            -DestinationPath dist/VolumeBooster-portable.zip -Force
           $lines = @(
-            (Get-FileHash dist/BoostAudio.exe -Algorithm SHA256).Hash + "  BoostAudio.exe"
-            (Get-FileHash dist/BoostAudio-portable.zip -Algorithm SHA256).Hash + "  BoostAudio-portable.zip"
+            (Get-FileHash dist/VolumeBooster.exe -Algorithm SHA256).Hash + "  VolumeBooster.exe"
+            (Get-FileHash dist/VolumeBooster-portable.zip -Algorithm SHA256).Hash + "  VolumeBooster-portable.zip"
           )
           $lines | Set-Content dist/SHA256SUMS-windows.txt -Encoding ascii
       - uses: actions/upload-artifact@v4
         with:
           name: windows
           path: |
-            dist/BoostAudio.exe
-            dist/BoostAudio-portable.zip
+            dist/VolumeBooster.exe
+            dist/VolumeBooster-portable.zip
             dist/SHA256SUMS-windows.txt
 
   linux:
@@ -55,18 +55,18 @@ jobs:
       - name: Build
         run: |
           python3 -m PyInstaller --noconfirm --clean --onefile \
-            --name BoostAudio \
+            --name VolumeBooster \
             --add-data "assets/volume-amplifier.ico:assets" \
             app.py
       - name: Checksums
         run: |
           cd dist
-          sha256sum BoostAudio > SHA256SUMS-linux.txt
+          sha256sum VolumeBooster > SHA256SUMS-linux.txt
       - uses: actions/upload-artifact@v4
         with:
           name: linux
           path: |
-            dist/BoostAudio
+            dist/VolumeBooster
             dist/SHA256SUMS-linux.txt
 
   publish:
@@ -80,9 +80,9 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: |
-            artifacts/windows/BoostAudio.exe
-            artifacts/windows/BoostAudio-portable.zip
+            artifacts/windows/VolumeBooster.exe
+            artifacts/windows/VolumeBooster-portable.zip
             artifacts/windows/SHA256SUMS-windows.txt
-            artifacts/linux/BoostAudio
+            artifacts/linux/VolumeBooster
             artifacts/linux/SHA256SUMS-linux.txt
           generate_release_notes: true

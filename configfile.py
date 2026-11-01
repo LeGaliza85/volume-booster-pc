@@ -3,7 +3,7 @@
 Equalizer APO only has one audio chain per device, so two `Preamp` blocks would
 add up instead of replacing each other. To stay safe:
 
-  * the gain lives in ``boostaudio.txt``, a file this app owns;
+  * the gain lives in ``volume-booster.txt``, a file this app owns;
   * ``config.txt`` only carries a single ``Include:`` line pointing at it;
   * the legacy block written by the previous app is removed, so exactly one gain
     source exists.
@@ -16,11 +16,11 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-INCLUDE_NAME = "boostaudio.txt"
+INCLUDE_NAME = "volume-booster.txt"
 INCLUDE_LINE = f"Include: {INCLUDE_NAME}"
 
-PRO_BEGIN = "# >>> BoostAudio >>>"
-PRO_END = "# <<< BoostAudio <<<"
+PRO_BEGIN = "# >>> Volume Booster >>>"
+PRO_END = "# <<< Volume Booster <<<"
 LEGACY_BEGIN = "# >>> Amplificador Voz >>>"
 LEGACY_END = "# <<< Amplificador Voz <<<"
 

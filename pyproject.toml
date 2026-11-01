@@ -1,7 +1,7 @@
 [project]
-name = "boostaudio"
+name = "volume-booster-pc"
 version = "1.0.0"
-description = "System-wide volume boost from 0 to 500 % (Equalizer APO on Windows, PipeWire/PulseAudio on Linux)."
+description = "Free, open-source system-wide volume booster for PC: raise Windows audio above 100 % (Equalizer APO) or boost Linux volume with PipeWire/PulseAudio."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"

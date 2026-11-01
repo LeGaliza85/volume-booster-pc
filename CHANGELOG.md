@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   numeric entry.
 - Real engine verification: reads the Equalizer APO COM classes each audio
   endpoint uses, so "applied" is never confused with "installed".
-- Isolated gain file (`boostaudio.txt`) referenced from Equalizer APO
+- Isolated gain file (`volume-booster.txt`) referenced from Equalizer APO
   through a single `Include:` line. The previous app's block is removed, so two
   gains can never stack.
 - Support bundle (`--diagnostics`): scrubbed report, engine state, recent log.
@@ -35,4 +35,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - macOS is not supported: it would need a virtual audio device, which adds
   latency.
 
-[1.0.0]: https://github.com/LeGaliza85/boostaudio/releases/tag/v1.0.0
+[1.0.0]: https://github.com/LeGaliza85/volume-booster-pc/releases/tag/v1.0.0

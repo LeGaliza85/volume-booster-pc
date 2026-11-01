@@ -1,4 +1,4 @@
-"""Translations for Volume Amplifier.
+"""Translations for Volume Booster PC.
 
 Nine languages, English as the fallback. Every table must expose the exact same
 set of keys (enforced by test_i18n.py) so a missing translation can never leak

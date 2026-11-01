@@ -1,64 +1,110 @@
-# BoostAudio
+# Volume Booster PC
 
-A focused, dark-themed volume control that pushes your system audio from **0 % to 500 %**
-(up to 1000 % if you allow it), with a real verification that Windows is applying it.
+[![ci](https://github.com/LeGaliza85/volume-booster-pc/actions/workflows/ci.yml/badge.svg)](https://github.com/LeGaliza85/volume-booster-pc/actions/workflows/ci.yml)
 
-- **Windows 10/11** — single portable `.exe`, no Python, no installer required.
-- **Linux** — native, no extra component.
-- **macOS** — not supported (needs a virtual audio device, which adds latency).
+**A free, open-source volume booster for PC that raises Windows audio above the
+100 % ceiling — up to 500 % (1000 % if you insist) — with no latency added and no
+telemetry at all.**
 
-> BoostAudio raises the **whole output endpoint**, not just headphones: the gain sits
-> before any `Device:` block. It keeps it in its own file (`boostaudio.txt`) so it can
-> never stack with another app's block: two `Preamp` filters in the same chain would
-> **add up**.
+Windows is very confident that 100 % is the loudest possible number. It is wrong.
+Volume Booster PC writes one line into Equalizer APO and proves, by reading the
+audio engine, that the boost is actually being applied instead of quietly doing
+nothing.
 
-![BoostAudio](assets/screenshot.png)
+![Volume Booster PC](assets/screenshot.png)
 
-## Why Windows warns you
+---
 
-The executable is **not code-signed**: a signing certificate costs ~200 €/year and
-this project is free. Windows SmartScreen shows *"Windows protected your PC"* for
-any new, unsigned binary — it is a reputation warning, not a virus detection.
+## Why this exists (and why it costs nothing)
 
-To continue: **More info → Run anyway**.
+There are plenty of "volume booster" apps out there. A surprising number of them
+want money, an account, a subscription, or all three — for writing a single line
+into a text file.
 
-If you prefer not to trust a binary, verify it or build it yourself:
+This one is **free for everyone, forever**. Not "free tier". Not "free with a Pro
+badge". Not "free until it is popular enough". Free: MIT licence, source included,
+no paywall, no telemetry, no ads, no nag screen, no account.
+
+I built it because paying for a volume slider is a strange thing to have to do.
+If a page ever asks you for money to download this, you are on the wrong page.
+
+**Cost of running it:** 0 €. **Cost of building it:** 0 €. **Cost of hearing your
+music at the volume you want:** also 0 €.
+
+---
+
+## What it actually does
+
+- **Boosts the whole output endpoint, not just headphones.** The gain is applied
+  before any `Device:` block, so speakers, headphones and virtual outputs all get
+  the same treatment.
+- **0 % to 500 %** with a continuous slider, plus an exact-number box for people
+  who know what they want.
+- **Verifies that the boost is real.** It reads the COM classes Windows registers
+  for each audio endpoint, so `Applied` never means "I wrote a file and hoped".
+- **Zero added latency.** It does not capture, buffer or replay audio — Equalizer
+  APO applies the gain in the existing path.
+- **Nine languages**, chosen automatically from your system language.
+- **One small window.** No tray bloat, no background service, no driver.
+
+### What it deliberately does not do
+
+- It does not "enhance" your audio with bass, 3D effects or magic.
+- It does not record, upload or inspect what you listen to.
+- It does not install a driver, a kernel extension or a service.
+
+---
+
+## Install on Windows
+
+1. Download **`VolumeBooster.exe`** (or `VolumeBooster-portable.zip`) from
+   [Releases](../../releases). There is no installer: it is one portable file.
+2. Equalizer APO is required for anything above 100 % (see below). Install it
+   once:
+   1. Get it from <https://sourceforge.net/projects/equalizerapo/>.
+   2. **Tick only the playback device you want to boost.** Ticking everything is
+      how you end up boosting the wrong thing.
+   3. Reboot.
+   4. Sound settings → your device → **Enhancements**: leave *Disable all
+      enhancements* **unticked**.
+3. Run `VolumeBooster.exe`, move the slider, press **Apply**.
+
+### "Windows protected your PC"
+
+The executable is **not code-signed**, because a signing certificate costs around
+200 €/year and this project has a budget of exactly zero. SmartScreen shows that
+warning for any new unsigned binary — it is a reputation warning, not a virus
+detection.
+
+Continue with **More info → Run anyway**, or verify the download instead:
 
 ```powershell
-# 1. Compare the hash with SHA256SUMS.txt from the same release
-Get-FileHash .\BoostAudio.exe -Algorithm SHA256
+# Compare against SHA256SUMS.txt from the same release
+Get-FileHash .\VolumeBooster.exe -Algorithm SHA256
 
-# 2. Or build from source (Python 3.11+)
+# Or build it yourself (Python 3.11+)
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
 
-## Install (Windows)
-
-1. Download `BoostAudio.exe` (or `BoostAudio-portable.zip`) from Releases.
-2. Run it. The status bar tells you what is happening.
-3. Equalizer APO is required for the boost above 100 %:
-
-   1. Install [Equalizer APO](https://sourceforge.net/projects/equalizerapo/) and tick **only the device you want to boost**.
-   2. Reboot.
-   3. Sound settings → your device → **Enhancements**: leave *Disable all enhancements* **unticked**.
-   4. Run the app again.
+---
 
 ## Status states
 
+The status bar is the app being honest with you.
+
 | State | Meaning | What to do |
 |---|---|---|
-| `Applied: … · Equalizer APO` | Gain written and the APO is attached to at least one device | Nothing |
-| `Equalizer APO is not attached to any device` | Installed, but no endpoint uses it | Re-run the installer and tick the device you want to boost |
-| `The config was changed outside the app` | Someone else edited the gain file | Press Apply |
-| `Boost engine not found` | Equalizer APO missing | Press Setup |
+| `Applied: … · Equalizer APO` | Gain written and the APO is attached to at least one endpoint | Nothing |
+| `Equalizer APO is not attached to any device` | Installed, but no endpoint uses it | Re-run the installer and tick your device |
+| `The config was changed outside the app` | Something else edited the gain file | Press **Apply** |
+| `Boost engine not found` | Equalizer APO is missing | Press **Setup** |
 
-The check reads the COM classes Windows registers for each audio endpoint. It is
-read-only, has no cost, and never plays audio.
+---
 
 ## Settings
 
-`%APPDATA%\BoostAudio\settings.json` is created on first run and can be
-edited by hand:
+`%APPDATA%\VolumeBooster\settings.json` is created on first run and can be edited
+by hand:
 
 | Key | Default | Range | Meaning |
 |---|---|---|---|
@@ -66,30 +112,67 @@ edited by hand:
 | `confirm_above` | `300` | 0–1000 | Ask before jumping above this level; `0` disables the question |
 | `restore_on_exit` | `false` | bool | Set the gain back to 100 % when the app closes |
 
-Invalid values are ignored and clamped; a broken file never crashes the app.
+Invalid values are ignored and clamped. A corrupted file never crashes the app —
+it just falls back to the defaults.
+
+---
 
 ## Languages
 
 English, Español, Français, Deutsch, Italiano, Português (BR), Русский,
-简体中文, 日本語. The app starts in your system language.
+简体中文, 日本語. The app starts in your system language and remembers what you
+pick.
 
-## Privacy
+---
 
-- No telemetry, no analytics, no network calls.
-- Audio never leaves the machine: the app only writes one line to a text file.
-- `--diagnostics` writes a support bundle to `%LOCALAPPDATA%\BoostAudio`.
-  It contains version, OS, engine state and the recent log, with your user name
-  and home path replaced by `<user>` / `<home>`.
+## Privacy and safety
+
+- **No telemetry, no analytics, no network calls.** Not even a version check.
+- **Audio never leaves the machine.** The app writes one number into one text
+  file. That is the whole pipeline.
+- **The rest of your config is untouched.** It owns one include file
+  (`volume-booster.txt`) and adds a single `Include:` line; every other line in
+  your Equalizer APO config stays byte-for-byte identical.
+- **Two gains can never stack.** Two `Preamp` filters in the same chain *add up*,
+  so the app removes the block written by the previous app and keeps exactly one
+  gain source.
+- **Writes are atomic** (temp file + replace) and preserve BOM, encoding and line
+  endings. The original config is backed up once before the first change.
+- **Fail closed.** A config with unbalanced markers is refused, never guessed at.
+- **`--diagnostics`** writes a support bundle with your user name and home path
+  replaced by `<user>` / `<home>`.
+
+---
 
 ## Command line
 
 ```
-BoostAudio.exe            # the UI
-BoostAudio.exe --version
-BoostAudio.exe --health   # verification state as JSON
-BoostAudio.exe --settings # effective settings and their path
-BoostAudio.exe --diagnostics
+VolumeBooster.exe                 # the UI
+VolumeBooster.exe --version
+VolumeBooster.exe --health        # verification state as JSON
+VolumeBooster.exe --settings      # effective settings and their path
+VolumeBooster.exe --diagnostics   # scrubbed support bundle
+VolumeBooster.exe --minimized     # start hidden
 ```
+
+---
+
+## How the boost works
+
+Windows clamps every audio endpoint at 100 %. No amount of API calls changes
+that, and a volume booster that only moves the Windows slider is lying to you.
+
+The only way past the ceiling without adding latency is a signed Audio Processing
+Object in the path. Equalizer APO registers one for each enabled endpoint, and it
+applies digital gain with no buffering — so the audio path stays exactly as long
+as it was. Capture-and-replay boosters are the other approach, and they add 20–50
+ms, which is why this one does not do that.
+
+The verification step reads the COM class IDs that Windows stores per endpoint
+under `…\MMDevices\Audio\Render\{guid}\FxProperties`. If the APO is there, the
+boost runs. If it is not, you get told instead of wondering.
+
+---
 
 ## Build from source
 
@@ -99,9 +182,7 @@ powershell -ExecutionPolicy Bypass -File build.ps1
 ```
 
 `build.ps1` regenerates the icon, builds the executable, creates the portable zip
-and writes `dist\SHA256SUMS.txt`.
-
-On Linux: `./build.sh`.
+and writes `dist\SHA256SUMS.txt`. On Linux, `./build.sh`.
 
 ## Tests
 
@@ -111,19 +192,43 @@ python app.py --smoke
 python app.py --smoke-ui
 ```
 
-`test_apo` and the smoke tests are Windows-only and skip elsewhere.
+`test_apo` and the smoke tests exercise Equalizer APO, so they run on Windows and
+skip elsewhere.
+
+---
 
 ## Platform support
 
 | OS | Status | Engine |
-| --- | --- | --- |
+|---|---|---|
 | Windows 10/11 | Full | Equalizer APO |
 | Linux (PipeWire/PulseAudio) | Full | `pactl set-sink-volume` |
-| macOS | Not supported | Would need a virtual audio device (adds latency) |
+| macOS | Not supported | Would need a virtual audio device, which adds latency |
+
+---
+
+## En español
+
+**Volume Booster PC** sube el volumen del sistema **por encima del 100 %**, hasta
+el 500 % (1000 % si te empeñas), sin añadir latencia y sin telemetría.
+
+- Sirve para **todo el audio del equipo**, no solo para auriculares.
+- **Gratis para siempre**, con el código a la vista y licencia MIT. Sin cuenta, sin
+  publicidad, sin versión "Pro". Si alguien te pide dinero por esto, no es esta
+  página.
+- En Windows necesita [Equalizer APO](https://sourceforge.net/projects/equalizerapo/)
+  instalado una vez: Windows no deja pasar del 100 % de otra forma.
+- En Linux usa `pactl` y no necesita nada más.
+
+Si lo que buscabas era **subir el volumen en Windows 11 por encima del 100 %**, o
+una **aplicación para subir el volumen al 200 %** en el PC, esto es exactamente
+eso: un *volume booster* de escritorio, gratuito y de código abierto.
+
+---
 
 ## Credits
 
-Made by **LeGaliza85** — https://github.com/LeGaliza85
+Made by **LeGaliza85** — <https://github.com/LeGaliza85>
 
 ## License
 

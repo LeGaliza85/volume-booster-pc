@@ -5,14 +5,14 @@ Set-Location -LiteralPath $PSScriptRoot
 python tools\make_icon.py
 
 python -m PyInstaller --noconfirm --clean --onefile --windowed `
-    --name BoostAudio `
+    --name VolumeBooster `
     --icon "assets\volume-amplifier.ico" `
     --version-file "version_info.txt" `
     --add-data "assets\volume-amplifier.ico;assets" `
     app.py
 
-$exe = "dist\BoostAudio.exe"
-$zip = "dist\BoostAudio-portable.zip"
+$exe = "dist\VolumeBooster.exe"
+$zip = "dist\VolumeBooster-portable.zip"
 
 if (Test-Path -LiteralPath $zip) { Remove-Item -LiteralPath $zip -Force }
 Compress-Archive -LiteralPath $exe, "README.md", "LICENSE" -DestinationPath $zip -CompressionLevel Optimal

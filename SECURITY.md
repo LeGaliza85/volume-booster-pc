@@ -9,12 +9,12 @@
 ## What this app does on your machine
 
 - Writes one line to Equalizer APO's config directory (a file it names
-  `boostaudio.txt`) and adds a single `Include:` line to `config.txt`.
+  `volume-booster.txt`) and adds a single `Include:` line to `config.txt`.
 - Optionally registers a per-user start-at-login entry
   (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run` or an XDG `.desktop`
   file). No administrator rights, no services, no drivers.
-- Stores the last value and the settings under `%APPDATA%\BoostAudio`
-  (`~/.config/boostaudio` on Linux).
+- Stores the last value and the settings under `%APPDATA%\VolumeBooster`
+  (`~/.config/volume-booster-pc` on Linux).
 - Sends nothing over the network. There is no telemetry, no updater and no
   analytics.
 

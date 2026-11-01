@@ -1,4 +1,4 @@
-"""BoostAudio - system-wide volume boost from 0 to 500 %."""
+"""Volume Booster PC - system-wide volume boost from 0 to 500 %."""
 
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ def default_state_path() -> Path:
     roaming = os.environ.get("APPDATA")
     if roaming:
         return Path(roaming) / version.APP_ID / "state.json"
-    return Path.home() / ".config" / "volume-amplifier" / "state.json"
+    return Path.home() / ".config" / "volume-booster-pc" / "state.json"
 
 
 STATE_PATH = default_state_path()
@@ -182,7 +182,7 @@ class AmplifierApp:
         header = tk.Frame(frame, bg=T.BG)
         header.pack(fill="x")
         tk.Label(
-            header, text=self.t("subtitle"), bg=T.BG, fg=T.MUTED, font=(self.family, 9)
+            header, text=self.t("subtitle"), bg=T.BG, fg=T.MUTED, font=(self.family, T.px(9))
         ).pack(side="left")
         self.lang_button = W.PillButton(
             header,
@@ -202,8 +202,8 @@ class AmplifierApp:
 
         number_row = tk.Frame(frame, bg=T.BG)
         number_row.pack(fill="x", pady=(12, 0))
-        self.number_font = tkfont.Font(family=self.family, size=46, weight="bold")
-        self.percent_font = tkfont.Font(family=self.family, size=15)
+        self.number_font = tkfont.Font(family=self.family, size=T.px(46), weight="bold")
+        self.percent_font = tkfont.Font(family=self.family, size=T.px(15))
         self.number_canvas = tk.Canvas(
             number_row, bg=T.BG, highlightthickness=0, bd=0, height=76, width=250
         )
@@ -220,7 +220,7 @@ class AmplifierApp:
             textvariable=self.gain_var,
             bg=T.BG,
             fg=T.ACCENT,
-            font=(self.family, 11, "bold"),
+            font=(self.family, T.px(11), "bold"),
         ).pack(anchor="w", pady=(0, 10))
 
         self.slider = W.ModernSlider(
@@ -235,19 +235,19 @@ class AmplifierApp:
 
         hints = tk.Frame(frame, bg=T.BG)
         hints.pack(fill="x")
-        tk.Label(hints, text="0", bg=T.BG, fg=T.MUTED, font=(self.family, 8)).pack(side="left")
+        tk.Label(hints, text="0", bg=T.BG, fg=T.MUTED, font=(self.family, T.px(8))).pack(side="left")
         tk.Label(
             hints,
             text=str(self.settings["max_percent"]),
             bg=T.BG,
             fg=T.MUTED,
-            font=(self.family, 8),
+            font=(self.family, T.px(8)),
         ).pack(side="right")
 
         exact = tk.Frame(frame, bg=T.BG)
         exact.pack(fill="x", pady=(16, 0))
         tk.Label(
-            exact, text=self.t("exact"), bg=T.BG, fg=T.MUTED, font=(self.family, 9)
+            exact, text=self.t("exact"), bg=T.BG, fg=T.MUTED, font=(self.family, T.px(9))
         ).pack(side="left")
         self.entry = tk.Entry(
             exact,
@@ -262,10 +262,10 @@ class AmplifierApp:
             highlightthickness=1,
             highlightbackground=T.BORDER,
             highlightcolor=T.ACCENT,
-            font=(self.family, 11),
+            font=(self.family, T.px(11)),
         )
         self.entry.pack(side="left", padx=(10, 5), ipady=5)
-        tk.Label(exact, text="%", bg=T.BG, fg=T.MUTED, font=(self.family, 10)).pack(side="left")
+        tk.Label(exact, text="%", bg=T.BG, fg=T.MUTED, font=(self.family, T.px(10))).pack(side="left")
         self.apply_button = W.PillButton(
             exact, self.t("apply"), self._apply, family=self.family, size=10
         )
@@ -284,7 +284,7 @@ class AmplifierApp:
             text=self.t("autostart"),
             bg=T.BG,
             fg=T.TEXT,
-            font=(self.family, 10),
+            font=(self.family, T.px(10)),
             cursor="hand2",
         )
         self.autostart_label.pack(side="left", padx=(10, 0))
@@ -297,7 +297,7 @@ class AmplifierApp:
             textvariable=self.warning_var,
             bg=T.BG,
             fg=T.WARN,
-            font=(self.family, 9),
+            font=(self.family, T.px(9)),
             wraplength=430,
             justify="left",
         )
@@ -314,7 +314,7 @@ class AmplifierApp:
             textvariable=self.status_var,
             bg=T.BG,
             fg=T.MUTED,
-            font=(self.family, 9),
+            font=(self.family, T.px(9)),
             wraplength=320,
             justify="left",
         )

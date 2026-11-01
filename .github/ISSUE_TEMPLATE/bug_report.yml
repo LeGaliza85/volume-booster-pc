@@ -6,14 +6,14 @@ body:
     attributes:
       value: |
         Thanks for the report. The fastest path to a fix is the support bundle:
-        run `BoostAudio.exe --diagnostics` and attach the zip it prints.
+        run `VolumeBooster.exe --diagnostics` and attach the zip it prints.
         It contains no audio, and your user name and home path are replaced.
   - type: input
     id: version
     attributes:
       label: Version
-      description: Output of `BoostAudio.exe --version`
-      placeholder: BoostAudio 1.0.0
+      description: Output of `VolumeBooster.exe --version`
+      placeholder: Volume Booster 1.0.0
     validations:
       required: true
   - type: dropdown

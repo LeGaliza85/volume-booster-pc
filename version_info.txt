@@ -16,12 +16,12 @@ VSVersionInfo(
           '040904B0',
           [
             StringStruct('CompanyName', 'LeGaliza85'),
-            StringStruct('FileDescription', 'System-wide volume boost, 0-500%'),
+            StringStruct('FileDescription', 'Volume Booster PC - system-wide volume boost, 0-500%'),
             StringStruct('FileVersion', '1.0.0.0'),
-            StringStruct('InternalName', 'BoostAudio'),
+            StringStruct('InternalName', 'VolumeBooster'),
             StringStruct('LegalCopyright', 'Copyright (c) 2026 LeGaliza85'),
-            StringStruct('OriginalFilename', 'BoostAudio.exe'),
-            StringStruct('ProductName', 'BoostAudio'),
+            StringStruct('OriginalFilename', 'VolumeBooster.exe'),
+            StringStruct('ProductName', 'Volume Booster'),
             StringStruct('ProductVersion', '1.0.0.0')
           ]
         )

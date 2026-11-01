@@ -1,24 +1,116 @@
 """Canvas-drawn controls: pill button, toggle switch and the volume slider.
 
 Tk's native widgets cannot be recoloured on Windows, so the controls are drawn
-on a Canvas. Each one is self-contained: it draws from its own state, exposes a
-small API and calls back on user interaction.
+on a Canvas. Tk's canvas primitives have no anti-aliasing, which leaves visible
+stair-stepping on every rounded edge, so the round parts are rendered here as
+small RGBA images: each pixel is the coverage of a 4x4 supersample grid, and Tk
+composites the alpha over the canvas. The images are cached per interpreter, so
+a redraw only recreates canvas items, never pixels.
+
+Each control is self-contained: it draws from its own state, exposes a small API
+and calls back on user interaction.
 """
 
 from __future__ import annotations
 
+import struct
 import tkinter as tk
+import zlib
 from tkinter import font as tkfont
 from typing import Literal
 
 import theme as T
 
+_SUPERSAMPLE = 4
+_CACHE: dict[tuple[str, int, str], tk.PhotoImage] = {}
+
+
+def _hex(colour: str) -> tuple[int, int, int]:
+    value = colour.lstrip("#")
+    return int(value[0:2], 16), int(value[2:4], 16), int(value[4:6], 16)
+
+
+def _png(width: int, height: int, rgba: bytearray) -> bytes:
+    """Minimal PNG writer: truecolour+alpha, no filters."""
+
+    def chunk(tag: bytes, data: bytes) -> bytes:
+        return (
+            struct.pack(">I", len(data))
+            + tag
+            + data
+            + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
+        )
+
+    raw = bytearray()
+    stride = width * 4
+    for y in range(height):
+        raw.append(0)
+        raw += rgba[y * stride : (y + 1) * stride]
+    return (
+        b"\x89PNG\r\n\x1a\n"
+        + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
+        + chunk(b"IDAT", zlib.compress(bytes(raw), 9))
+        + chunk(b"IEND", b"")
+    )
+
+
+def _disc(master, diameter: float, colour: str) -> tk.PhotoImage | None:
+    """Anti-aliased filled circle, or None when Tk cannot build the image."""
+    size = max(2, round(diameter))
+    key = (str(master.tk), size, colour)
+    image = _CACHE.get(key)
+    if image is not None:
+        return image
+
+    red, green, blue = _hex(colour)
+    radius = size / 2
+    step = 1.0 / _SUPERSAMPLE
+    total = _SUPERSAMPLE * _SUPERSAMPLE
+    data = bytearray(size * size * 4)
+    try:
+        for y in range(size):
+            for x in range(size):
+                hits = 0
+                for sy in range(_SUPERSAMPLE):
+                    dy = y + (sy + 0.5) * step - radius
+                    for sx in range(_SUPERSAMPLE):
+                        dx = x + (sx + 0.5) * step - radius
+                        if dx * dx + dy * dy <= radius * radius:
+                            hits += 1
+                if hits:
+                    offset = (y * size + x) * 4
+                    data[offset] = red
+                    data[offset + 1] = green
+                    data[offset + 2] = blue
+                    data[offset + 3] = hits * 255 // total
+        image = tk.PhotoImage(master=master, data=_png(size, size, data), format="png")
+    except tk.TclError:
+        return None
+    _CACHE[key] = image
+    return image
+
 
 def _pill(canvas: tk.Canvas, x1: float, y1: float, x2: float, y2: float, colour: str) -> None:
-    radius = (y2 - y1) / 2
-    canvas.create_oval(x1, y1, x1 + 2 * radius, y2, fill=colour, outline="")
-    canvas.create_oval(x2 - 2 * radius, y1, x2, y2, fill=colour, outline="")
-    canvas.create_rectangle(x1 + radius, y1, x2 - radius, y2, fill=colour, outline="")
+    """Rounded ends drawn as two discs, so the curve is anti-aliased."""
+    left, top = round(x1), round(y1)
+    right, bottom = round(x2), round(y2)
+    height = bottom - top
+    if height % 2:
+        bottom -= 1
+        height -= 1
+    if height < 2:
+        canvas.create_rectangle(left, top, right, bottom, fill=colour, outline="")
+        return
+    radius = height // 2
+    centre = top + radius
+    canvas.create_rectangle(left + radius, top, right - radius, bottom, fill=colour, outline="")
+    disc = _disc(canvas, height, colour)
+    if disc is None:
+        canvas.create_oval(left, top, left + height, bottom, fill=colour, outline="")
+        canvas.create_oval(right - height, top, right, bottom, fill=colour, outline="")
+        return
+    canvas.create_image(left + radius, centre, image=disc, anchor="center")
+    canvas.create_image(right - radius, centre, image=disc, anchor="center")
 
 
 class PillButton(tk.Canvas):
@@ -46,7 +138,7 @@ class PillButton(tk.Canvas):
         self._fill, self._hover, self._pressed, self._fg = fill, hover, pressed, fg
         self._padx = padx
         self._text = text
-        self._font = tkfont.Font(family=family, size=size, weight=weight)
+        self._font = tkfont.Font(family=family, size=T.px(size), weight=weight)
         self._colour = fill
 
         self.configure(cursor="hand2", takefocus=1)
@@ -132,15 +224,19 @@ class ToggleSwitch(tk.Canvas):
         radius = height / 2
         _pill(self, 0, 0, width, height, T.ACCENT if self._value else T.TRACK)
         centre = width - radius if self._value else radius
-        knob = radius - 3
-        self.create_oval(
-            centre - knob,
-            radius - knob,
-            centre + knob,
-            radius + knob,
-            fill="#FFFFFF",
-            outline="",
-        )
+        knob = int(radius) - 3
+        disc = _disc(self, 2 * knob, "#FFFFFF")
+        if disc is None:
+            self.create_oval(
+                centre - knob,
+                radius - knob,
+                centre + knob,
+                radius + knob,
+                fill="#FFFFFF",
+                outline="",
+            )
+            return
+        self.create_image(round(centre), round(radius), image=disc, anchor="center")
 
 
 class ModernSlider(tk.Canvas):
@@ -225,6 +321,17 @@ class ModernSlider(tk.Canvas):
         ratio = max(0.0, min(1.0, ratio))
         self.set_value(round(self.minimum + ratio * (self.maximum - self.minimum)), notify=True)
 
+    def _bar(self, left: float, right: float, centre: float, colour: str) -> None:
+        half = self.TRACK_WIDTH // 2
+        self.create_rectangle(left, centre - half, right, centre + half, fill=colour, outline="")
+        disc = _disc(self, self.TRACK_WIDTH, colour)
+        if disc is None:
+            self.create_oval(left - half, centre - half, left + half, centre + half, fill=colour, outline="")
+            self.create_oval(right - half, centre - half, right + half, centre + half, fill=colour, outline="")
+            return
+        self.create_image(left, centre, image=disc, anchor="center")
+        self.create_image(right, centre, image=disc, anchor="center")
+
     def _draw(self) -> None:
         self.delete("all")
         width = self.winfo_width()
@@ -233,30 +340,18 @@ class ModernSlider(tk.Canvas):
         centre = self.HEIGHT / 2
         left = self.PADDING
         right = width - self.PADDING
-        self.create_line(
-            left,
-            centre,
-            right,
-            centre,
-            width=self.TRACK_WIDTH,
-            capstyle="round",
-            fill=T.TRACK,
-        )
+        self._bar(left, right, centre, T.TRACK)
         thumb_x = self._thumb_x()
-        self.create_line(
-            left,
-            centre,
-            max(left, thumb_x),
-            centre,
-            width=self.TRACK_WIDTH,
-            capstyle="round",
-            fill=T.ACCENT,
-        )
-        self.create_oval(
-            thumb_x - self.THUMB,
-            centre - self.THUMB,
-            thumb_x + self.THUMB,
-            centre + self.THUMB,
-            fill="#FFFFFF",
-            outline="",
-        )
+        self._bar(left, max(left, thumb_x), centre, T.ACCENT)
+        disc = _disc(self, 2 * self.THUMB, "#FFFFFF")
+        if disc is None:
+            self.create_oval(
+                thumb_x - self.THUMB,
+                centre - self.THUMB,
+                thumb_x + self.THUMB,
+                centre + self.THUMB,
+                fill="#FFFFFF",
+                outline="",
+            )
+            return
+        self.create_image(thumb_x, centre, image=disc, anchor="center")
