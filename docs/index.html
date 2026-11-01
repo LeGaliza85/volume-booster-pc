@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subir el volumen de Windows 11 por encima del 100 % — Volume Booster PC</title>
+<meta name="description" content="Cómo subir el volumen de Windows 11 por encima del 100 %: hasta el 500 % o el 1000 %, gratis, sin latencia y sin telemetría. Amplificador de volumen para PC con Equalizer APO. Código abierto, sin cuenta y sin publicidad.">
+<meta name="keywords" content="subir volumen windows 11 por encima del 100, subir volumen al 200, amplificador de volumen pc, volume booster windows, aumentar volumen pc, volume booster gratis">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Volume Booster PC — sube el volumen por encima del 100 %">
+<meta property="og:description" content="Amplificador de volumen gratis para Windows 10/11: hasta el 500 % (o 1000 %), sin latencia, sin telemetría y sin cuenta.">
+<meta property="og:image" content="https://raw.githubusercontent.com/LeGaliza85/volume-booster-pc/main/assets/screenshot.png">
+<link rel="icon" href="https://raw.githubusercontent.com/LeGaliza85/volume-booster-pc/main/assets/volume-amplifier.ico">
+<style>
+  :root {
+    --bg: #0B1220; --surface: #16223A; --border: #24324E;
+    --text: #F2F6FC; --muted: #8DA0BC; --accent: #4F8CFF; --warn: #FBBF24;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.65 "Segoe UI", system-ui, sans-serif;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 22px; }
+  header { padding: 44px 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 42px); line-height: 1.15; margin: 0 0 14px; }
+  h1 span { color: var(--accent); }
+  .lead { font-size: 19px; color: var(--muted); margin: 0 0 26px; }
+  .cta {
+    display: inline-block; background: var(--accent); color: #fff;
+    padding: 14px 26px; border-radius: 999px; font-weight: 600;
+    text-decoration: none; margin: 0 10px 10px 0;
+  }
+  .cta.secondary { background: var(--surface); color: var(--text); }
+  .shot { width: 100%; max-width: 480px; border-radius: 12px; border: 1px solid var(--border); margin: 26px 0; display: block; }
+  h2 { font-size: 24px; margin: 44px 0 12px; }
+  h3 { font-size: 17px; margin: 22px 0 6px; }
+  p, li { color: var(--muted); }
+  strong { color: var(--text); }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 18px 0; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+  .card h3 { margin-top: 0; color: var(--text); }
+  .note { border-left: 3px solid var(--warn); background: var(--surface); padding: 14px 18px; border-radius: 0 10px 10px 0; margin: 18px 0; }
+  .note p { color: var(--text); margin: 0; }
+  code { background: var(--surface); padding: 2px 6px; border-radius: 5px; color: var(--text); }
+  footer { border-top: 1px solid var(--border); margin-top: 52px; padding: 22px 0 44px; font-size: 14px; color: var(--muted); }
+  .lang { font-size: 14px; color: var(--muted); margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Subir el volumen de Windows 11 <span>por encima del 100 %</span></h1>
+  <p class="lead">
+    Windows se empeña en que 100 % es el máximo. Se equivoca. <strong>Volume Booster PC</strong>
+    sube el volumen de todo el sistema hasta el <strong>500 %</strong> —o el 1000 % si te empeñas—
+    sin añadir latencia, sin cuenta y sin telemetría.
+  </p>
+  <a class="cta" href="https://github.com/LeGaliza85/volume-booster-pc/releases/latest">Descargar gratis</a>
+  <a class="cta secondary" href="https://github.com/LeGaliza85/volume-booster-pc">Ver el código</a>
+  <p class="lang">También en inglés: <a href="https://github.com/LeGaliza85/volume-booster-pc#readme">README</a></p>
+</header>
+
+<img class="shot" src="https://raw.githubusercontent.com/LeGaliza85/volume-booster-pc/main/assets/screenshot.png" alt="Interfaz de Volume Booster PC con el deslizador al 500 %">
+
+<h2>¿Por qué Windows no pasa del 100 %?</h2>
+<p>
+  Porque el límite no está en el deslizador: está en el motor de audio. Windows recorta cada
+  dispositivo al 100 % y ninguna llamada de la API lo cambia. La única forma de superarlo sin
+  ganar latencia es un APO (Audio Processing Object) firmado dentro de la cadena de audio:
+  <strong>Equalizer APO</strong>. Eso es lo que hace esta aplicación: escribe una línea en su
+  configuración, y además <strong>verifica leyendo el motor</strong> que el refuerzo se está
+  aplicando de verdad, en lugar de suponerlo.
+</p>
+
+<h2>Qué hace</h2>
+<div class="grid">
+  <div class="card"><h3>Hasta 500 %, o 1000 %</h3><p>Deslizador continuo y caja de valor exacto. Tú decides el techo en Configuración.</p></div>
+  <div class="card"><h3>Todo el equipo</h3><p>Aplica al dispositivo de salida completo, no solo a los auriculares.</p></div>
+  <div class="card"><h3>Cero latencia añadida</h3><p>No captura, ni almacena, ni reproduce audio: el APO aplica la ganancia en la ruta que ya existe.</p></div>
+  <div class="card"><h3>Comprobado, no supuesto</h3><p>Lee las clases COM de cada salida, así que «aplicado» nunca significa «escribí un fichero y esperé».</p></div>
+  <div class="card"><h3>Probar antes de aplicar</h3><p>Un botón reproduce un tono corto al nivel actual, y el deslizador suena mientras lo mueves.</p></div>
+  <div class="card"><h3>Sin cuenta, sin anuncios</h3><p>Un único ejecutable portable o un instalador por usuario, sin permisos de administrador.</p></div>
+</div>
+
+<h2 id="gratis">Gratis, y que siga siéndolo</h2>
+<p>
+  Es <strong>software libre con licencia MIT</strong>: puedes usarlo, estudiarlo y compartirlo.
+  Lo hice para que nadie tenga que pagar por un deslizador de volumen. No hay versión «Pro»,
+  ni suscripción, ni recopilación de datos.
+</p>
+<p>
+  Dos cosas, por si acaso: <strong>no lo vendas ni montes un producto de pago con él</strong>, y
+  si lo usas en un proyecto, un vídeo o una herramienta, <strong>se agradece el crédito a
+  LeGaliza85</strong>. Es una petición, no una condición de la licencia: la MIT permite venderlo
+  y no exige crédito, y prefiero decirlo claro a fingir lo contrario.
+</p>
+
+<div class="note">
+  <p>
+    <strong>⚠️ El audio muy alto puede dañar tu oído y tus altavoces.</strong> Hasta el 1000 %
+    son +20 dB. Tú decides cuánta ganancia aplicar; el autor no se hace responsable de los daños
+    auditivos, de los equipos dañados ni de ningún otro perjuicio derivado de usar este programa.
+  </p>
+</div>
+
+<h2>Preguntas frecuentes</h2>
+
+<h3>¿Cómo subo el volumen al 200 %?</h3>
+<p>Mueve el deslizador hasta 200 y pulsa Aplicar. El 200 % equivale a +6 dB. Si prefieres el valor exacto, escríbelo en la caja.</p>
+
+<h3>¿Necesito Equalizer APO?</h3>
+<p>Solo en Windows, y solo una vez: instalarlo, marcar el dispositivo que quieres amplificar y reiniciar. La aplicación te lleva a la descarga y al selector de dispositivos desde su propia ventana de Configuración.</p>
+
+<h3>¿Se oye peor?</h3>
+<p>No por el hecho de amplificar, pero sí puede saturar: por encima de +6 dB, el material que ya está grabado fuerte empieza a recortarse. La app te avisa al pasar de 200 %.</p>
+
+<h3>¿Funciona en Linux?</h3>
+<p>Sí, con PipeWire o PulseAudio, que ya permiten pasar del 100 % de forma nativa. macOS no: exigiría un dispositivo de audio virtual, y eso añade latencia.</p>
+
+<h3>¿Es de pago?</h3>
+<p>No. Gratis, con el código a la vista, sin cuenta ni telemetría. Si alguien te pide dinero por esto, no es esta página.</p>
+
+<footer>
+  <p>
+    <a href="https://github.com/LeGaliza85/volume-booster-pc">Repositorio</a> ·
+    <a href="https://github.com/LeGaliza85/volume-booster-pc/releases/latest">Descargas</a> ·
+    <a href="https://github.com/LeGaliza85/volume-booster-pc/blob/main/LICENSE">Licencia MIT</a> ·
+    <a href="https://github.com/LeGaliza85/volume-booster-pc/blob/main/DISCLAIMER.txt">Aviso</a>
+  </p>
+  <p>Hecho por LeGaliza85. Windows 10 y 11. Sin telemetría.</p>
+</footer>
+
+</div>
+</body>
+</html>
