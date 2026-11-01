@@ -34,3 +34,11 @@ jobs:
           python -m unittest test_configfile test_apo test_i18n test_platform
           test_settings test_diagnostics test_verify test_report test_hotkey
           test_winenv test_preview test_update
+      # The smokes build the real window and the real engine path, so they catch a
+      # broken import or a crash that unit tests never touch. Windows only: they
+      # need Equalizer APO and Tk widgets.
+      - name: Smoke tests
+        if: runner.os == 'Windows'
+        run: |
+          python app.py --smoke
+          python app.py --smoke-ui

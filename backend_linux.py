@@ -15,7 +15,6 @@ _PERCENT = re.compile(r"(\d+)%")
 class LinuxBackend:
     key = "linux"
     engine = "PipeWire / PulseAudio"
-    help_key = "help_linux"
 
     def __init__(self) -> None:
         self.pactl = shutil.which("pactl")

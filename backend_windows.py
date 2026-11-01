@@ -9,7 +9,6 @@ from backend import BackendError
 class WindowsBackend:
     key = "windows"
     engine = "Equalizer APO"
-    help_key = "help_windows"
 
     def __init__(self) -> None:
         self.path = apo.find_config_path()

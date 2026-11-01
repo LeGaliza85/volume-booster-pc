@@ -22,7 +22,6 @@ class BackendError(Exception):
 class UnsupportedBackend:
     key = "unsupported"
     engine = "-"
-    help_key = "help_macos"
 
     def available(self) -> bool:
         return False

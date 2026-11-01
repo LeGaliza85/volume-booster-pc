@@ -88,31 +88,6 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "autostart": "Start at login",
         "autostart_question": "Let this app start when you sign in, so the selector is ready?",
         "autostart_failed": "Could not change the startup setting: {error}",
-        "help_windows": (
-            "Windows caps every device at 100 %, so the gain is applied by Equalizer APO.\n\n"
-            "1. Download it: sourceforge.net/projects/equalizerapo/\n"
-            "2. Install it and tick ONLY the playback device you want to boost.\n"
-            "3. Reboot.\n"
-            "4. Sound > your device > Enhancements: leave "
-            "'Disable all enhancements' unticked.\n\n"
-            "Expected config file:\n{location}"
-        ),
-        "help_linux": (
-            "PipeWire or PulseAudio applies system volume above 100 % natively, so no "
-            "extra component is needed.\n\n"
-            "If the engine is missing, install it:\n"
-            "  Debian/Ubuntu: sudo apt install pulseaudio-utils\n"
-            "  Fedora: sudo dnf install pulseaudio-utils\n"
-            "  Arch: sudo pacman -S libpulse\n\n"
-            "Check which sink is used:\n  pactl get-default-sink\n\n"
-            "Detected engine:\n{location}"
-        ),
-        "help_macos": (
-            "macOS has no system-wide gain above 100 % without a virtual audio device, "
-            "and that kind of device adds latency.\n\n"
-            "This version supports Windows and Linux only. On macOS the selector opens "
-            "but the boost stays disabled."
-        ),
     },
     "es": {
         "subtitle": "Amplificación de volumen del sistema",
@@ -176,32 +151,6 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "autostart": "Iniciar al entrar",
         "autostart_question": "¿Dejar que la app arranque al iniciar sesión para tener el selector listo?",
         "autostart_failed": "No se pudo cambiar el inicio automático: {error}",
-        "help_windows": (
-            "Windows limita cada dispositivo al 100 %, así que el boost lo aplica "
-            "Equalizer APO.\n\n"
-            "1. Descárgalo: sourceforge.net/projects/equalizerapo/\n"
-            "2. Instálalo marcando SOLO el dispositivo que quieras amplificar.\n"
-            "3. Reinicia.\n"
-            "4. Sonido > tu dispositivo > Mejoras: deja «Deshabilitar todas las "
-            "mejoras» sin marcar.\n\n"
-            "Fichero de configuración esperado:\n{location}"
-        ),
-        "help_linux": (
-            "PipeWire o PulseAudio aplican volumen de sistema por encima del 100 % de "
-            "forma nativa, así que no hace falta nada más.\n\n"
-            "Si falta el motor, instálalo:\n"
-            "  Debian/Ubuntu: sudo apt install pulseaudio-utils\n"
-            "  Fedora: sudo dnf install pulseaudio-utils\n"
-            "  Arch: sudo pacman -S libpulse\n\n"
-            "Comprueba qué salida se usa:\n  pactl get-default-sink\n\n"
-            "Motor detectado:\n{location}"
-        ),
-        "help_macos": (
-            "macOS no permite superar el 100 % en todo el sistema sin un dispositivo de "
-            "audio virtual, y ese dispositivo añade latencia.\n\n"
-            "Esta versión soporta solo Windows y Linux. En macOS el selector se abre, "
-            "pero el boost queda desactivado."
-        ),
     },
     "fr": {
         "subtitle": "Amplification du volume système",
@@ -265,33 +214,6 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "autostart": "Lancer à la connexion",
         "autostart_question": "Autoriser l'app à démarrer à la connexion pour avoir le sélecteur prêt ?",
         "autostart_failed": "Impossible de modifier le démarrage : {error}",
-        "help_windows": (
-            "Windows limite chaque périphérique à 100 %, le gain est donc appliqué par "
-            "Equalizer APO.\n\n"
-            "1. Téléchargez-le : sourceforge.net/projects/equalizerapo/\n"
-            "2. Installez-le en cochant UNIQUEMENT le périphérique à amplifier.\n"
-            "3. Redémarrez.\n"
-            "4. Son > votre périphérique > Améliorations : laissez « Désactiver toutes "
-            "les améliorations » décoché.\n\n"
-            "Fichier de configuration attendu :\n{location}"
-        ),
-        "help_linux": (
-            "PipeWire ou PulseAudio applique nativement un volume système au-delà de "
-            "100 %, aucun composant supplémentaire n'est nécessaire.\n\n"
-            "Si le moteur manque, installez-le :\n"
-            "  Debian/Ubuntu : sudo apt install pulseaudio-utils\n"
-            "  Fedora : sudo dnf install pulseaudio-utils\n"
-            "  Arch : sudo pacman -S libpulse\n\n"
-            "Vérifiez la sortie utilisée :\n  pactl get-default-sink\n\n"
-            "Moteur détecté :\n{location}"
-        ),
-        "help_macos": (
-            "macOS ne permet pas de dépasser 100 % sur tout le système sans un "
-            "périphérique audio virtuel, et ce type de périphérique ajoute de la "
-            "latence.\n\n"
-            "Cette version ne prend en charge que Windows et Linux. Sur macOS le "
-            "sélecteur s'ouvre mais l'amplification reste désactivée."
-        ),
     },
     "de": {
         "subtitle": "Systemweite Lautstärkeverstärkung",
@@ -355,32 +277,6 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "autostart": "Bei Anmeldung starten",
         "autostart_question": "Darf die App bei der Anmeldung starten, damit der Regler bereit ist?",
         "autostart_failed": "Starteinstellung konnte nicht geändert werden: {error}",
-        "help_windows": (
-            "Windows begrenzt jedes Gerät auf 100 %, daher übernimmt Equalizer APO die "
-            "Verstärkung.\n\n"
-            "1. Herunterladen: sourceforge.net/projects/equalizerapo/\n"
-            "2. Installieren und NUR das zu verstärkende Gerät ankreuzen.\n"
-            "3. Neu starten.\n"
-            "4. Sound > Ihr Gerät > Verbesserungen: „Alle Verbesserungen deaktivieren“ "
-            "nicht ankreuzen.\n\n"
-            "Erwartete Konfigurationsdatei:\n{location}"
-        ),
-        "help_linux": (
-            "PipeWire oder PulseAudio kann die Systemlautstärke von Haus aus über 100 % "
-            "setzen, eine weitere Komponente ist also nicht nötig.\n\n"
-            "Falls die Engine fehlt, installieren Sie sie:\n"
-            "  Debian/Ubuntu: sudo apt install pulseaudio-utils\n"
-            "  Fedora: sudo dnf install pulseaudio-utils\n"
-            "  Arch: sudo pacman -S libpulse\n\n"
-            "Verwendete Ausgabe prüfen:\n  pactl get-default-sink\n\n"
-            "Erkannte Engine:\n{location}"
-        ),
-        "help_macos": (
-            "macOS erlaubt systemweit keine Verstärkung über 100 % ohne ein virtuelles "
-            "Audiogerät, und solche Geräte erzeugen Latenz.\n\n"
-            "Diese Version unterstützt nur Windows und Linux. Unter macOS öffnet sich "
-            "der Regler, die Verstärkung bleibt aber deaktiviert."
-        ),
     },
     "it": {
         "subtitle": "Amplificazione del volume di sistema",
@@ -444,32 +340,6 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "autostart": "Avvia all'accesso",
         "autostart_question": "Consentire all'app di avviarsi all'accesso, così il selettore è pronto?",
         "autostart_failed": "Impossibile modificare l'avvio automatico: {error}",
-        "help_windows": (
-            "Windows limita ogni dispositivo al 100 %, quindi il guadagno lo applica "
-            "Equalizer APO.\n\n"
-            "1. Scaricalo: sourceforge.net/projects/equalizerapo/\n"
-            "2. Installalo selezionando SOLO il dispositivo da amplificare.\n"
-            "3. Riavvia.\n"
-            "4. Audio > il tuo dispositivo > Miglioramenti: lascia deselezionato "
-            "«Disattiva tutti i miglioramenti».\n\n"
-            "File di configurazione atteso:\n{location}"
-        ),
-        "help_linux": (
-            "PipeWire o PulseAudio applicano nativamente un volume di sistema oltre il "
-            "100 %, quindi non serve altro.\n\n"
-            "Se il motore manca, installalo:\n"
-            "  Debian/Ubuntu: sudo apt install pulseaudio-utils\n"
-            "  Fedora: sudo dnf install pulseaudio-utils\n"
-            "  Arch: sudo pacman -S libpulse\n\n"
-            "Controlla l'uscita in uso:\n  pactl get-default-sink\n\n"
-            "Motore rilevato:\n{location}"
-        ),
-        "help_macos": (
-            "macOS non consente di superare il 100 % su tutto il sistema senza un "
-            "dispositivo audio virtuale, e quel tipo di dispositivo aggiunge latenza.\n\n"
-            "Questa versione supporta solo Windows e Linux. Su macOS il selettore si "
-            "apre ma il boost resta disattivato."
-        ),
     },
     "pt": {
         "subtitle": "Amplificação do volume do sistema",
@@ -533,32 +403,6 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "autostart": "Iniciar ao entrar",
         "autostart_question": "Permitir que o app inicie ao entrar, para o seletor ficar pronto?",
         "autostart_failed": "Não foi possível alterar a inicialização: {error}",
-        "help_windows": (
-            "O Windows limita cada dispositivo a 100 %, então o ganho é aplicado pelo "
-            "Equalizer APO.\n\n"
-            "1. Baixe: sourceforge.net/projects/equalizerapo/\n"
-            "2. Instale marcando SOMENTE o dispositivo que deseja amplificar.\n"
-            "3. Reinicie.\n"
-            "4. Som > seu dispositivo > Aprimoramentos: deixe «Desativar todos os "
-            "aprimoramentos» desmarcado.\n\n"
-            "Arquivo de configuração esperado:\n{location}"
-        ),
-        "help_linux": (
-            "O PipeWire ou o PulseAudio aplicam volume de sistema acima de 100 % "
-            "nativamente, então nenhum componente extra é necessário.\n\n"
-            "Se o motor estiver faltando, instale:\n"
-            "  Debian/Ubuntu: sudo apt install pulseaudio-utils\n"
-            "  Fedora: sudo dnf install pulseaudio-utils\n"
-            "  Arch: sudo pacman -S libpulse\n\n"
-            "Veja qual saída está em uso:\n  pactl get-default-sink\n\n"
-            "Motor detectado:\n{location}"
-        ),
-        "help_macos": (
-            "O macOS não permite passar de 100 % em todo o sistema sem um dispositivo "
-            "de áudio virtual, e esse tipo de dispositivo adiciona latência.\n\n"
-            "Esta versão suporta apenas Windows e Linux. No macOS o seletor abre, mas o "
-            "boost fica desativado."
-        ),
     },
     "ru": {
         "subtitle": "Усиление системной громкости",
@@ -622,32 +466,6 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "autostart": "Запускать при входе",
         "autostart_question": "Разрешить приложению запускаться при входе, чтобы регулятор был готов?",
         "autostart_failed": "Не удалось изменить автозапуск: {error}",
-        "help_windows": (
-            "Windows ограничивает каждое устройство до 100 %, поэтому усиление "
-            "применяет Equalizer APO.\n\n"
-            "1. Скачайте: sourceforge.net/projects/equalizerapo/\n"
-            "2. Установите, отметив ТОЛЬКО устройство, которое нужно усилить.\n"
-            "3. Перезагрузите компьютер.\n"
-            "4. Звук > ваше устройство > Улучшения: не отмечайте «Отключить все "
-            "улучшения».\n\n"
-            "Ожидаемый файл конфигурации:\n{location}"
-        ),
-        "help_linux": (
-            "PipeWire или PulseAudio умеют поднимать системную громкость выше 100 % "
-            "из коробки, поэтому ничего дополнительно ставить не нужно.\n\n"
-            "Если движка нет, установите его:\n"
-            "  Debian/Ubuntu: sudo apt install pulseaudio-utils\n"
-            "  Fedora: sudo dnf install pulseaudio-utils\n"
-            "  Arch: sudo pacman -S libpulse\n\n"
-            "Проверьте используемый выход:\n  pactl get-default-sink\n\n"
-            "Обнаруженный движок:\n{location}"
-        ),
-        "help_macos": (
-            "macOS не позволяет превысить 100 % для всей системы без виртуального "
-            "аудиоустройства, а такие устройства добавляют задержку.\n\n"
-            "Эта версия поддерживает только Windows и Linux. На macOS регулятор "
-            "открывается, но усиление отключено."
-        ),
     },
     "zh": {
         "subtitle": "系统音量增强",
@@ -711,30 +529,6 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "autostart": "登录时启动",
         "autostart_question": "允许应用在登录时启动，以便随时使用滑块？",
         "autostart_failed": "无法更改启动设置：{error}",
-        "help_windows": (
-            "Windows 将每个设备的音量限制在 100 %，因此增益由 Equalizer APO 应用。\n\n"
-            "1. 下载：sourceforge.net/projects/equalizerapo/\n"
-            "2. 安装时只勾选要增强的设备。\n"
-            "3. 重启电脑。\n"
-            "4. 声音 > 你的设备 > 增强：不要勾选“禁用所有增强功能”。\n\n"
-            "预期的配置文件：\n{location}"
-        ),
-        "help_linux": (
-            "PipeWire 或 PulseAudio 原生支持把系统音量设为 100 % 以上，因此不需要"
-            "额外组件。\n\n"
-            "如果缺少引擎，请安装：\n"
-            "  Debian/Ubuntu: sudo apt install pulseaudio-utils\n"
-            "  Fedora: sudo dnf install pulseaudio-utils\n"
-            "  Arch: sudo pacman -S libpulse\n\n"
-            "查看当前使用的输出：\n  pactl get-default-sink\n\n"
-            "检测到的引擎：\n{location}"
-        ),
-        "help_macos": (
-            "macOS 在没有虚拟音频设备的情况下无法对全系统超过 100 % 增益，而这类"
-            "设备会增加延迟。\n\n"
-            "此版本仅支持 Windows 和 Linux。在 macOS 上滑块可以打开，但增益保持"
-            "禁用。"
-        ),
     },
     "ja": {
         "subtitle": "システム全体の音量ブースト",
@@ -798,32 +592,6 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "autostart": "ログイン時に起動",
         "autostart_question": "ログイン時に起動して、すぐにスライダーを使えるようにしますか？",
         "autostart_failed": "スタートアップ設定を変更できませんでした: {error}",
-        "help_windows": (
-            "Windows はすべてのデバイスを 100 % に制限するため、ブーストは "
-            "Equalizer APO が適用します。\n\n"
-            "1. ダウンロード: sourceforge.net/projects/equalizerapo/\n"
-            "2. インストール時にブーストしたいデバイスだけを選択します。\n"
-            "3. 再起動します。\n"
-            "4. サウンド > デバイス > 拡張機能:「すべての拡張機能を無効にする」を"
-            "オフのままにします。\n\n"
-            "想定される設定ファイル:\n{location}"
-        ),
-        "help_linux": (
-            "PipeWire または PulseAudio は 100 % を超えるシステム音量を標準で扱える"
-            "ため、追加のコンポーネントは不要です。\n\n"
-            "エンジンがない場合はインストールします:\n"
-            "  Debian/Ubuntu: sudo apt install pulseaudio-utils\n"
-            "  Fedora: sudo dnf install pulseaudio-utils\n"
-            "  Arch: sudo pacman -S libpulse\n\n"
-            "使用中の出力を確認:\n  pactl get-default-sink\n\n"
-            "検出したエンジン:\n{location}"
-        ),
-        "help_macos": (
-            "macOS では仮想オーディオデバイスなしにシステム全体で 100 % を超える"
-            "ゲインをかけられず、その種のデバイスは遅延を追加します。\n\n"
-            "このバージョンは Windows と Linux のみ対応です。macOS ではスライダーは"
-            "開きますが、ブーストは無効のままです。"
-        ),
     },
 }
 

@@ -49,9 +49,6 @@ class TranslationTests(unittest.TestCase):
             "autostart",
             "autostart_question",
             "autostart_failed",
-            "help_windows",
-            "help_linux",
-            "help_macos",
         ):
             self.assertIn(key, i18n.TRANSLATIONS[i18n.FALLBACK])
 
