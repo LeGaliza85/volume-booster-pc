@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.4.1] - 2026-11-01
+
+### Fixed
+
+- **Change device sent you to the download page.** Equalizer APO 1.4 ships the
+  device picker as `DeviceSelector.exe`; the app only looked for `Configurator.exe`,
+  did not find it, and fell back to opening the download page for a program that was
+  already installed. It now looks for DeviceSelector first, and when none is found
+  it says so instead of pretending.
+- **"Disable all enhancements" is no longer guesswork.** Windows stores it per
+  endpoint as `PKEY_AudioEndpoint_Disable_SysFx`, so the app can tell when a device
+  is blocked. The row appears only while it is actually disabled, names the device,
+  and disappears on its own once the box is unticked — nothing to mark as done.
+
 ## [1.4.0] - 2026-11-01
 
 ### Changed

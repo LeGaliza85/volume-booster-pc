@@ -38,11 +38,16 @@ class AttachedTests(unittest.TestCase):
         self.assertEqual(rows["req_attached"]["state"], winenv.OK)
         self.assertNotIn("req_reboot", rows)
 
-    def test_enhancements_is_advice_with_a_button(self):
+    def test_enhancements_hidden_when_the_apo_is_working(self):
         rows = by_key(winenv.inspect(installed=True, level="ok"))
-        self.assertEqual(rows["req_enhancements"]["state"], winenv.INFO)
+        self.assertNotIn("req_enhancements", rows)
+
+    def test_enhancements_red_when_windows_blocks_the_device(self):
+        rows = by_key(winenv.inspect(installed=True, level="ok", blocked=["Altavoces"]))
+        self.assertEqual(rows["req_enhancements"]["state"], winenv.FAIL)
         self.assertEqual(rows["req_enhancements"]["action"], winenv.OPEN_SOUND)
         self.assertEqual(rows["req_enhancements"]["label"], "open_sound")
+        self.assertEqual(rows["req_enhancements"]["device"], "Altavoces")
 
 
 class DetachedTests(unittest.TestCase):

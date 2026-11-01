@@ -4,10 +4,11 @@ Only what actually needs attention is returned. A row that is fine and has
 nothing to do would just be noise, and the settings window is a list of things to
 fix, not a status screen.
 
-The two things the app cannot detect are shown as instructions, never as a fake
-verdict: whether "Disable all enhancements" is ticked, and whether Windows still
-wants a reboot. The second one is inferred from the APO not being attached yet,
-which is the only reboot signal that belongs to this app's domain.
+"Disable all enhancements" *is* detectable: Windows stores it per endpoint as
+PKEY_AudioEndpoint_Disable_SysFx (verify.py reads it). Windows still offers no way
+to open one device's properties page directly, so the row explains the clicks and
+the button opens the Sound panel — but the row appears and disappears on its own,
+without the user having to mark anything as done.
 """
 
 from __future__ import annotations
@@ -28,6 +29,11 @@ OPEN_CONFIGURATOR = "configurator"
 OPEN_SOUND = "sound"
 NONE = "none"
 
+# Equalizer APO 1.4 ships the device picker as DeviceSelector.exe; older builds
+# called it Configurator.exe. Missing either one used to fall back to the download
+# page, which is nonsense when the app is already installed.
+_CONFIGURATOR_NAMES = ("DeviceSelector.exe", "Configurator.exe", "EqualizerAPO.exe")
+
 
 def _startfile(target: str) -> bool:
     try:
@@ -38,15 +44,16 @@ def _startfile(target: str) -> bool:
 
 
 def configurator() -> Path | None:
-    """Equalizer APO's Configurator, where devices get ticked."""
+    """The executable where devices get ticked."""
     if not sys.platform.startswith("win"):
         return None
     for variable in ("ProgramFiles", "ProgramW6432", "ProgramFiles(x86)"):
         root = os.environ.get(variable)
         if not root:
             continue
-        for name in ("Configurator.exe", "EqualizerAPO.exe"):
-            candidate = Path(root) / "EqualizerAPO" / name
+        folder = Path(root) / "EqualizerAPO"
+        for name in _CONFIGURATOR_NAMES:
+            candidate = folder / name
             if candidate.exists():
                 return candidate
     return None
@@ -70,7 +77,7 @@ def open_download() -> bool:
 def open_configurator() -> bool:
     target = configurator()
     if target is None:
-        return open_download()
+        return False
     return _startfile(str(target))
 
 
@@ -78,7 +85,7 @@ def open_sound() -> bool:
     """The Sound control panel, where a device's Enhancements tab lives.
 
     Windows has no documented way to open one device's properties page directly,
-    so this lands on the Playback tab and the instructions say what to click next.
+    so this lands on the Playback tab and the row text says what to click next.
     """
     if not sys.platform.startswith("win"):
         return False
@@ -102,35 +109,44 @@ def open_action(action: str) -> bool:
     return False
 
 
-def inspect(*, installed: bool, level: str) -> list[dict]:
+def inspect(*, installed: bool, level: str, blocked: list[str] | None = None) -> list[dict]:
     """Rows that need the user's attention, in the order they should be fixed."""
     attached = level in ("ok", "drift")
     if not installed:
         return [
+            {"key": "req_engine", "state": FAIL, "action": OPEN_DOWNLOAD, "label": "download"}
+        ]
+
+    if not attached:
+        return [
             {
-                "key": "req_engine",
+                "key": "req_attached",
                 "state": FAIL,
-                "action": OPEN_DOWNLOAD,
-                "label": "download",
-            }
+                "action": OPEN_CONFIGURATOR,
+                "label": "open",
+            },
+            # Attached means the APO is already running, so there is nothing to
+            # reboot for. Not attached right after an install usually is.
+            {"key": "req_reboot", "state": INFO, "action": NONE, "label": NONE},
         ]
 
     rows: list[dict] = [
         {
             "key": "req_attached",
-            "state": OK if attached else FAIL,
+            "state": OK,
             "action": OPEN_CONFIGURATOR,
-            "label": "change" if attached else "open",
-        },
-        {
-            "key": "req_enhancements",
-            "state": INFO,
-            "action": OPEN_SOUND,
-            "label": "open_sound",
-        },
+            "label": "change",
+        }
     ]
-    if not attached:
-        # Attached means the APO is already running, so there is nothing to reboot
-        # for. Not attached right after an install usually is a pending restart.
-        rows.append({"key": "req_reboot", "state": INFO, "action": NONE, "label": NONE})
+    device = (blocked or [""])[0]
+    if device:
+        rows.append(
+            {
+                "key": "req_enhancements",
+                "state": FAIL,
+                "action": OPEN_SOUND,
+                "label": "open_sound",
+                "device": device,
+            }
+        )
     return rows

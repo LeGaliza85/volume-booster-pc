@@ -10,6 +10,7 @@ from __future__ import annotations
 import contextlib
 import functools
 import tkinter as tk
+from tkinter import messagebox
 
 import hotkey
 import settings
@@ -165,8 +166,17 @@ class SettingsWindow:
             child.destroy()
         installed = winenv.apo_installed()
         health = self.app.health()
-        for requirement in winenv.inspect(installed=installed, level=health.get("level", "missing")):
+        blocked = health.get("blocked") or []
+        rows = winenv.inspect(
+            installed=installed, level=health.get("level", "missing"), blocked=blocked
+        )
+        for requirement in rows:
             self._requirement_row(requirement)
+
+    def _run_action(self, action: str) -> None:
+        if winenv.open_action(action):
+            return
+        messagebox.showinfo(self.app.t("setup"), self.app.t("action_failed"))
 
     def _requirement_row(self, requirement: dict) -> None:
         row = tk.Frame(self._requirements, bg=T.BG)
@@ -182,7 +192,7 @@ class SettingsWindow:
         body.pack(side="left", fill="x", expand=True, padx=(8, 8))
         tk.Label(
             body,
-            text=self.app.t(requirement["key"]),
+            text=self.app.t(requirement["key"], device=requirement.get("device", "")),
             bg=T.BG,
             fg=T.TEXT,
             font=(self.app.family, T.px(10)),
@@ -190,7 +200,7 @@ class SettingsWindow:
         ).pack(fill="x")
         tk.Label(
             body,
-            text=self.app.t(requirement["key"] + "_body"),
+            text=self.app.t(requirement["key"] + "_body", device=requirement.get("device", "")),
             bg=T.BG,
             fg=T.MUTED,
             font=(self.app.family, T.px(8)),
@@ -203,7 +213,7 @@ class SettingsWindow:
             W.PillButton(
                 row,
                 self.app.t(requirement.get("label", "open")),
-                lambda name=action: winenv.open_action(name),
+                functools.partial(self._run_action, action),
                 family=self.app.family,
                 size=8,
                 weight="normal",

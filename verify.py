@@ -21,6 +21,7 @@ _RENDER_KEY = r"SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Render
 _FX_PROPERTY = "{d04e05a6-594b-4fb6-a80d-01af5eed7d1d}"
 _FRIENDLY_NAME = "{a45c254e-df1c-4efd-8020-67d146a850e0},2"
 _INSTALL_KEY = r"SOFTWARE\EqualizerAPO"
+_SYSFX_PROPERTY = "{1da5d803-d492-4edd-8c23-e0c0ffee7f0e},5"
 
 _PREAMP = re.compile(r"^Preamp:\s*(-?\d+(?:\.\d+)?)\s*dB", re.IGNORECASE | re.MULTILINE)
 _TOLERANCE_DB = 0.05
@@ -90,6 +91,25 @@ def _friendly_name(winreg, guid: str) -> str:
         return guid
 
 
+def _enhancements_disabled(winreg, guid: str) -> bool:
+    """PKEY_AudioEndpoint_Disable_SysFx: the "Disable all enhancements" checkbox.
+
+    It lives in the endpoint's Properties key, not in FxProperties, and it is
+    absent when the box is unticked, which is the healthy default.
+    """
+    try:
+        with winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE, rf"{_RENDER_KEY}\{guid}\Properties"
+        ) as key:
+            value, _kind = winreg.QueryValueEx(key, _SYSFX_PROPERTY)
+    except OSError:
+        return False
+    try:
+        return int(value) != 0
+    except (TypeError, ValueError):
+        return False
+
+
 def render_endpoints() -> list[dict]:
     """Every render endpoint present on the machine, with its attachment state."""
     if not sys.platform.startswith("win"):
@@ -117,6 +137,7 @@ def render_endpoints() -> list[dict]:
                         "id": guid,
                         "name": _friendly_name(winreg, guid),
                         "attached": endpoint_has_apo(properties),
+                        "enhancements_disabled": _enhancements_disabled(winreg, guid),
                     }
                 )
     except OSError:
@@ -150,6 +171,19 @@ def health(
         return {"level": "detached", "endpoints": len(endpoints)}
 
     names = [item["name"] for item in attached]
+    blocked = [
+        item["name"] for item in attached if item.get("enhancements_disabled")
+    ]
     if config_text is None or not matches_expected(config_text, expected_db):
-        return {"level": "drift", "devices": names, "endpoints": len(endpoints)}
-    return {"level": "ok", "devices": names, "endpoints": len(endpoints)}
+        return {
+            "level": "drift",
+            "devices": names,
+            "endpoints": len(endpoints),
+            "blocked": blocked,
+        }
+    return {
+        "level": "ok",
+        "devices": names,
+        "endpoints": len(endpoints),
+        "blocked": blocked,
+    }
