@@ -57,8 +57,14 @@ music at the volume you want:** also 0 €.
 
 ## Install on Windows
 
-1. Download **`VolumeBooster.exe`** (or `VolumeBooster-portable.zip`) from
-   [Releases](../../releases). There is no installer: it is one portable file.
+Pick whichever you prefer — both are the same program.
+
+| Download | Best for |
+|---|---|
+| **`VolumeBoosterSetup.exe`** | Most people. Per-user install, no administrator prompt, Start-menu entry and a clean uninstaller |
+| **`VolumeBooster.exe`** | Portable: one file, nothing installed, run it from anywhere |
+
+1. Download one of them from [Releases](../../releases).
 2. Equalizer APO is required for anything above 100 % (see below). Install it
    once:
    1. Get it from <https://sourceforge.net/projects/equalizerapo/>.
@@ -67,7 +73,7 @@ music at the volume you want:** also 0 €.
    3. Reboot.
    4. Sound settings → your device → **Enhancements**: leave *Disable all
       enhancements* **unticked**.
-3. Run `VolumeBooster.exe`, move the slider, press **Apply**.
+3. Run Volume Booster, move the slider, press **Apply**.
 
 ### "Windows protected your PC"
 

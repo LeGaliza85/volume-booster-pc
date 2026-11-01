@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2026-11-01
+
+### Added
+
+- Windows installer (`VolumeBoosterSetup.exe`, Inno Setup). It is per-user, so it
+  never asks for administrator rights, and it ships a Start-menu entry and a
+  clean uninstaller. The portable executable is still available and unchanged.
+- `build-installer.ps1` for building the installer locally.
+
+### Changed
+
+- The app is now called **Volume Booster** and the repository is
+  `volume-booster-pc`, so it reads as a volume booster for PC in search.
+- Rounded controls are anti-aliased: pills, the toggle and the slider thumb are
+  rendered from a 4x4 supersample grid instead of Tk's aliased primitives.
+- Fonts use whole-pixel sizes, so glyphs sit on the pixel grid.
+
 ## [1.0.0] - 2026-10-31
 
 ### Added

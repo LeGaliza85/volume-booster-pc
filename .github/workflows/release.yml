@@ -30,9 +30,21 @@ jobs:
         run: |
           Compress-Archive -LiteralPath dist/VolumeBooster.exe, README.md, LICENSE `
             -DestinationPath dist/VolumeBooster-portable.zip -Force
+      - name: Build installer
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          $iscc = Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6\ISCC.exe"
+          $version = (Select-String -Path version.py -Pattern '^VERSION = "(.+)"').Matches[0].Groups[1].Value
+          & $iscc "/DAppVersion=$version" "installer\volume-booster.iss"
+          if (-not (Test-Path -LiteralPath "dist/VolumeBoosterSetup.exe")) { throw "installer was not produced" }
+      - name: Checksums
+        shell: pwsh
+        run: |
           $lines = @(
             (Get-FileHash dist/VolumeBooster.exe -Algorithm SHA256).Hash + "  VolumeBooster.exe"
             (Get-FileHash dist/VolumeBooster-portable.zip -Algorithm SHA256).Hash + "  VolumeBooster-portable.zip"
+            (Get-FileHash dist/VolumeBoosterSetup.exe -Algorithm SHA256).Hash + "  VolumeBoosterSetup.exe"
           )
           $lines | Set-Content dist/SHA256SUMS-windows.txt -Encoding ascii
       - uses: actions/upload-artifact@v4
@@ -41,6 +53,7 @@ jobs:
           path: |
             dist/VolumeBooster.exe
             dist/VolumeBooster-portable.zip
+            dist/VolumeBoosterSetup.exe
             dist/SHA256SUMS-windows.txt
 
   linux:
@@ -82,6 +95,7 @@ jobs:
           files: |
             artifacts/windows/VolumeBooster.exe
             artifacts/windows/VolumeBooster-portable.zip
+            artifacts/windows/VolumeBoosterSetup.exe
             artifacts/windows/SHA256SUMS-windows.txt
             artifacts/linux/VolumeBooster
             artifacts/linux/SHA256SUMS-linux.txt

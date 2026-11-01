@@ -50,7 +50,7 @@ class ReportTests(unittest.TestCase):
     def test_report_identity_and_scrubbing(self):
         report = diagnostics.build_report({"state": {"percent": 320, "language": "es"}})
         self.assertEqual(report["app"], version.APP_NAME)
-        self.assertEqual(report["version"], "1.0.0")
+        self.assertEqual(report["version"], version.VERSION)
         self.assertEqual(report["state"]["percent"], 320)
         self.assertNotIn(str(Path.home()), json.dumps(report))
 
