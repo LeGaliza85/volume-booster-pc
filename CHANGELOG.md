@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5.5] - 2026-11-01
+
+### Fixed
+
+- **The app still did not come back after an automatic update.** The installer was
+  started with `DETACHED_PROCESS`; with that flag Inno finishes the install but
+  never runs its `[Run]` entry, so the relaunch silently never happened. A plain
+  child process is enough, and Windows keeps it alive after the app exits.
+
 ## [1.5.4] - 2026-11-01
 
 ### Added

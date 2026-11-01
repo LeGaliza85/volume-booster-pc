@@ -28,7 +28,7 @@ class LaunchTests(unittest.TestCase):
         self.assertEqual(args[0][0], str(setup))
         for flag in ("/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART"):
             self.assertIn(flag, args[0])
-        self.assertIn("creationflags", kwargs)
+        self.assertNotIn("creationflags", kwargs)
 
     def test_a_failure_to_start_is_reported(self):
         with mock.patch.object(updater.subprocess, "Popen", side_effect=OSError("nope")):

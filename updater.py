@@ -15,8 +15,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-DETACHED_PROCESS = 0x00000008
-CREATE_NEW_PROCESS_GROUP = 0x00000200
 INSTALL_FLAGS = ("/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART")
 
 
@@ -32,15 +30,17 @@ def installed_build() -> bool:
 
 
 def launch(setup: Path) -> bool:
-    """Start the silent installer detached. The caller quits right after."""
+    """Start the silent installer and let it outlive us.
+
+    No ``DETACHED_PROCESS``: with that flag Inno Setup finishes the install but
+    never runs its ``[Run]`` entry, so the app never comes back. A plain child is
+    enough — Windows does not kill it when this process exits, which is what the
+    app does right after this call.
+    """
     if not sys.platform.startswith("win"):
         return False
     try:
-        subprocess.Popen(
-            [str(setup), *INSTALL_FLAGS],
-            creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP,
-            close_fds=True,
-        )
+        subprocess.Popen([str(setup), *INSTALL_FLAGS], close_fds=True)
     except OSError:
         return False
     return True
