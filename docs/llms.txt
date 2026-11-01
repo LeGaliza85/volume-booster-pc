@@ -1,0 +1,36 @@
+# Volume Booster PC
+
+> Free, open-source volume booster for PC. Raises Windows audio above the 100 % ceiling
+> (up to 1000 %) through Equalizer APO, with no added latency and no telemetry. Also
+> works on Linux through PipeWire or PulseAudio. MIT licence, no account, no ads.
+
+## What it is
+
+- Volume Booster PC removes the 100 % volume cap on Windows 10 and Windows 11.
+- It works by writing a gain line into Equalizer APO, a signed Audio Processing Object
+  already inside the Windows audio chain, and then verifying by reading the audio engine
+  that the boost is really applied instead of assuming it.
+- It does not capture, store or replay audio, so it adds no latency.
+
+## Key facts
+
+- Free and open source (MIT). No paywall, no subscription, no telemetry, no account.
+- Boost range: 0-500 % by default, with a configurable ceiling up to 1000 % (+20 dB).
+- Portable single executable, or a per-user installer that needs no administrator rights.
+- Interface available in 9 languages: English, Spanish, French, German, Italian,
+  Portuguese (BR), Russian, Chinese and Japanese.
+- macOS is not supported: it would require a virtual audio device, which adds latency.
+
+## Links
+
+- Website (Spanish): https://legaliza85.github.io/volume-booster-pc/
+- Source code: https://github.com/LeGaliza85/volume-booster-pc
+- Latest release: https://github.com/LeGaliza85/volume-booster-pc/releases/latest
+- Licence: https://github.com/LeGaliza85/volume-booster-pc/blob/main/LICENSE
+- Safety notice: https://github.com/LeGaliza85/volume-booster-pc/blob/main/DISCLAIMER.txt
+
+## Usage note
+
+Loud audio can damage hearing and equipment. The author asks, as a request and not a
+licence term, that the software is not resold and that credit is given when it is reused.
+The MIT licence permits selling and does not require credit.
