@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] - 2026-11-01
+
+### Added
+
+- **Preview tone**: a short Test button next to Apply plays a tone through the
+  current chain, and moving the slider plays one at the level you are pointing to.
+  The tone is generated in memory with fades at both ends and its amplitude is
+  clamped, so it can never clip. preview_sound turns it off.
+- **Don't ask again** in the loud-level warning, which is now a small themed window
+  instead of a message box. It sets confirm_above to 0; Settings -> Sound can
+  turn the warning back on.
+
+### Changed
+
+- The loud-level warning no longer uses a native message box, so it can carry the
+  checkbox and match the app's theme.
+
 ## [1.2.2] - 2026-11-01
 
 ### Fixed

@@ -33,4 +33,4 @@ jobs:
         run: >
           python -m unittest test_configfile test_apo test_i18n test_platform
           test_settings test_diagnostics test_verify test_report test_hotkey
-          test_winenv test_hotkey test_winenv
+          test_winenv test_preview

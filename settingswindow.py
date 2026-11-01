@@ -11,6 +11,7 @@ import functools
 import tkinter as tk
 
 import hotkey
+import settings
 import theme as T
 import widgets as W
 import winenv
@@ -64,6 +65,10 @@ class SettingsWindow:
             justify="left",
         )
         self._hotkey_hint.pack(fill="x", padx=22, pady=(4, 0))
+
+        self._section(self.app.t("sound_section"))
+        self._toggle_row("preview_sound", self.app.t("preview_sound"))
+        self._warn_row()
 
         self._section(self.app.t("start_section"))
         self._toggle_row("start_hidden", self.app.t("start_hidden"))
@@ -120,6 +125,25 @@ class SettingsWindow:
         tk.Label(
             row, text=label, bg=T.BG, fg=T.TEXT, font=(self.app.family, T.px(10)), cursor="hand2"
         ).pack(side="left", padx=(10, 0))
+
+    def _warn_row(self) -> None:
+        row = tk.Frame(self.top, bg=T.BG)
+        row.pack(fill="x", padx=22, pady=3)
+        enabled = int(self.app.settings.get("confirm_above", 0)) > 0
+        W.ToggleSwitch(row, enabled, self._set_warn).pack(side="left")
+        tk.Label(
+            row,
+            text=self.app.t("warn_loud"),
+            bg=T.BG,
+            fg=T.TEXT,
+            font=(self.app.family, T.px(10)),
+            cursor="hand2",
+        ).pack(side="left", padx=(10, 0))
+
+    def _set_warn(self, value: bool) -> None:
+        default = int(settings.DEFAULTS["confirm_above"])
+        self.app.settings["confirm_above"] = default if value else 0
+        self.app.save_settings()
 
     def _on_field_click(self, key: str, _event) -> None:
         self._start_capture(key)

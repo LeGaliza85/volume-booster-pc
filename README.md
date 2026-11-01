@@ -40,6 +40,10 @@ music at the volume you want:** also 0 €.
   the same treatment.
 - **0 % to 500 %** with a continuous slider, plus an exact-number box for people
   who know what they want.
+- **Listen before you commit.** A **Test** button plays a short tone through the
+  current chain, and moving the slider plays a tone at the level you are pointing
+  to — so you hear the difference instead of guessing. The preview can be turned
+  off in Settings.
 - **Verifies that the boost is real.** It reads the COM classes Windows registers
   for each audio endpoint, so `Applied` never means "I wrote a file and hoped".
 - **Zero added latency.** It does not capture, buffer or replay audio — Equalizer
@@ -137,6 +141,10 @@ Click **Setup** and you get a real settings window, not a message box:
 - **Global hotkeys** — click a shortcut and press the combination you want.
 - **Startup** — start in the notification area, and close to it.
 
+If you push the slider into a very loud level, the app asks first. That warning
+has a **Don't ask again** switch, and you can turn it back on from
+**Settings → Sound**.
+
 `%APPDATA%\VolumeBooster\settings.json` can also be edited by hand:
 
 | Key | Default | Range | Meaning |
@@ -148,6 +156,7 @@ Click **Setup** and you get a real settings window, not a message box:
 | `close_to_tray` | `true` | bool | Closing the window hides it instead of quitting |
 | `hotkey_up` | `Ctrl+Alt+Up` | hotkey | Louder by 10 %; empty string disables it |
 | `hotkey_down` | `Ctrl+Alt+Down` | hotkey | Quieter by 10 %; empty string disables it |
+| `preview_sound` | `true` | bool | Play a tone while moving the slider |
 
 Invalid values are ignored and clamped. A corrupted file never crashes the app —
 it just falls back to the defaults.
@@ -244,7 +253,7 @@ and writes `dist\SHA256SUMS.txt`. On Linux, `./build.sh`.
 ## Tests
 
 ```
-python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report test_hotkey test_winenv
+python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report test_hotkey test_winenv test_preview
 python app.py --smoke
 python app.py --smoke-ui
 ```

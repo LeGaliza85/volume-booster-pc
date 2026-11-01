@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import sys
+import time
 import tkinter as tk
 import webbrowser
 from collections.abc import Callable
@@ -20,10 +21,12 @@ from tkinter import messagebox
 import autostart
 import backend as backends
 import configfile
+import confirmdialog
 import diagnostics
 import gainmath
 import hotkey
 import i18n
+import preview
 import report
 import settings
 import settingswindow
@@ -46,6 +49,7 @@ HOTKEY_DOWN = 2
 BOOST_STEP = 10
 TRAY_PUMP_MS = 60
 TOAST_DELAY_MS = 700
+PREVIEW_INTERVAL = 0.25
 
 
 def resource_path(relative: str) -> Path:
@@ -147,6 +151,7 @@ class AmplifierApp:
         self._dot_colour = T.MUTED
         self.use_tray = use_tray
         self._toast_job: str | None = None
+        self._last_preview = 0.0
         self.settings_window: settingswindow.SettingsWindow | None = None
         self.tray: tray.Tray | None = None
 
@@ -288,6 +293,20 @@ class AmplifierApp:
             exact, self.t("apply"), self._apply, family=self.family, size=10
         )
         self.apply_button.pack(side="right")
+        self.test_button = W.PillButton(
+            exact,
+            self.t("test"),
+            self._test_tone,
+            family=self.family,
+            size=10,
+            weight="normal",
+            fill=T.SURFACE,
+            hover=T.SURFACE_HOVER,
+            pressed=T.SURFACE_HOVER,
+            fg=T.TEXT,
+            padx=14,
+        )
+        self.test_button.pack(side="right", padx=(0, 8))
         self.entry.bind("<Return>", lambda _event: self._apply())
         self.entry.bind("<FocusOut>", lambda _event: self._apply())
 
@@ -543,6 +562,26 @@ class AmplifierApp:
     def _on_slide(self, value: int) -> None:
         self.percent = value
         self._refresh(value)
+        self._preview_level(value)
+
+    def _preview_level(self, value: int) -> None:
+        """A short tone that sounds like the level the slider points to.
+
+        The gain has not been written yet while dragging, so the tone carries the
+        difference between the target and what is applied: played through the APO,
+        the result matches the slider position instead of doubling the boost.
+        """
+        if not self.settings.get("preview_sound", True):
+            return
+        now = time.monotonic()
+        if now - self._last_preview < PREVIEW_INTERVAL:
+            return
+        self._last_preview = now
+        delta = gainmath.percent_to_db(value) - gainmath.percent_to_db(self._applied)
+        preview.play_level(max(-24.0, min(24.0, delta)))
+
+    def _test_tone(self) -> None:
+        preview.play_level(0.0, preview.LONG_MS)
 
     def _on_slide_release(self, value: int) -> None:
         self.percent = value
@@ -595,7 +634,14 @@ class AmplifierApp:
         value = max(0, min(self.settings["max_percent"], gainmath.clamp_percent(number)))
         if settings.should_confirm(value, self.settings) and value > self._applied:
             gain_text = gainmath.format_db(gainmath.percent_to_db(value))
-            if not messagebox.askyesno(version.APP_NAME, self.t("confirm_loud", gain=gain_text)):
+            accepted, dont_ask = confirmdialog.LoudConfirm(self).confirm(
+                self.t("confirm_loud", gain=gain_text)
+            )
+            if dont_ask:
+                self.settings["confirm_above"] = 0
+                self.save_settings()
+                LOG.info("loud confirmation disabled by the user")
+            if not accepted:
                 self.percent = self._applied
                 self._refresh(self.percent)
                 return
