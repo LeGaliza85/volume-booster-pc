@@ -25,6 +25,17 @@ jobs:
           --version-file version_info.txt
           --add-data "assets/volume-amplifier.ico;assets"
           app.py
+      # The installer ships the folder build: an installed one-file app unpacks
+      # itself into %TEMP% on every start, which is what broke the relaunch after
+      # an automatic update.
+      - name: Build folder payload
+        run: >
+          python -m PyInstaller --noconfirm --clean --onedir --windowed
+          --name VolumeBooster
+          --icon assets/volume-amplifier.ico
+          --version-file version_info.txt
+          --add-data "assets/volume-amplifier.ico;assets"
+          app.py
       - name: Package
         shell: pwsh
         run: |
