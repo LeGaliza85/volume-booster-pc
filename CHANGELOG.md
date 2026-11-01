@@ -4,6 +4,17 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.4.2] - 2026-11-01
+
+### Fixed
+
+- **The Device Selector no longer fails with "no Qt platform plugin could be
+  initialized".** Equalizer APO's Qt tools keep their plugins in `qt/platforms`
+  and ship no `qt.conf`, so they only find them when the process starts inside
+  their own folder. `os.startfile` inherited our working directory. The
+  Configurator is now started with its folder as the working directory, the same
+  way the Start-menu shortcut does it, and a test pins that argument.
+
 ## [1.4.1] - 2026-11-01
 
 ### Fixed

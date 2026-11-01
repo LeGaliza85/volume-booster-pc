@@ -43,6 +43,21 @@ def _startfile(target: str) -> bool:
         return False
 
 
+def _launch(path: Path) -> bool:
+    """Start an executable with its own folder as the working directory.
+
+    Equalizer APO's Qt tools ship plugins in ``qt/platforms`` and have no
+    ``qt.conf``, so they only find them when the process starts inside their
+    folder. ``os.startfile`` inherits our directory, which is why the Device
+    Selector died with "no Qt platform plugin could be initialized".
+    """
+    try:
+        subprocess.Popen([str(path)], cwd=str(path.parent))
+    except OSError:
+        return False
+    return True
+
+
 def configurator() -> Path | None:
     """The executable where devices get ticked."""
     if not sys.platform.startswith("win"):
@@ -78,7 +93,7 @@ def open_configurator() -> bool:
     target = configurator()
     if target is None:
         return False
-    return _startfile(str(target))
+    return _launch(target)
 
 
 def open_sound() -> bool:
