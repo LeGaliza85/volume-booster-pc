@@ -15,7 +15,7 @@ Python 3.11 or newer. There are no runtime dependencies.
 ```
 ruff check .
 mypy
-python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify
+python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report
 python app.py --smoke
 python app.py --smoke-ui
 ```

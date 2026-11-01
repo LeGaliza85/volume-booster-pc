@@ -10,6 +10,7 @@ import logging
 import os
 import sys
 import tkinter as tk
+import webbrowser
 from ctypes import wintypes
 from pathlib import Path
 from tkinter import font as tkfont
@@ -21,6 +22,7 @@ import configfile
 import diagnostics
 import gainmath
 import i18n
+import report
 import settings
 import theme as T
 import version
@@ -335,6 +337,17 @@ class AmplifierApp:
         )
         self.setup_button.pack(side="right")
 
+        self.report_label = tk.Label(
+            frame,
+            text=self.t("report"),
+            bg=T.BG,
+            fg=T.MUTED,
+            font=(self.family, T.px(8), "underline"),
+            cursor="hand2",
+        )
+        self.report_label.pack(anchor="w", pady=(10, 0))
+        self.report_label.bind("<Button-1>", lambda _event: self._report_bug())
+
         self.root.update_idletasks()
         width = max(self.root.winfo_reqwidth(), 480)
         height = self.root.winfo_reqheight()
@@ -360,6 +373,13 @@ class AmplifierApp:
         self.language = code
         save_state(self.percent, self.language)
         self._rebuild()
+
+    def _report_bug(self) -> None:
+        url = report.build_issue_url(
+            app_version=version.VERSION, os_name=report.os_option()
+        )
+        LOG.info("opening the bug report form")
+        webbrowser.open(url)
 
     def _rebuild(self) -> None:
         for child in self.root.winfo_children():
@@ -659,6 +679,9 @@ def main() -> int:
         return 0
     if "--diagnostics" in arguments:
         return _diagnostics()
+    if "--report" in arguments:
+        print(report.build_issue_url(app_version=version.VERSION, os_name=report.os_option()))
+        return 0
     if "--smoke" in arguments:
         return _smoke_engine()
     if "--smoke-ui" in arguments:

@@ -4,6 +4,17 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-11-01
+
+### Added
+
+- **Report a bug** link in the window, and a `--report` flag that prints the same
+  URL. It opens the GitHub issue form with the app version and the operating
+  system already filled in, so the report arrives complete instead of asking the
+  reporter to look things up.
+- A troubleshooting section in the README explaining what makes a report useful
+  (`--diagnostics`, the status bar text, the Equalizer APO state).
+
 ## [1.0.1] - 2026-11-01
 
 ### Added

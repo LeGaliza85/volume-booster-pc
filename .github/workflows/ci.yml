@@ -32,4 +32,4 @@ jobs:
       - name: Tests
         run: >
           python -m unittest test_configfile test_apo test_i18n test_platform
-          test_settings test_diagnostics test_verify
+          test_settings test_diagnostics test_verify test_report

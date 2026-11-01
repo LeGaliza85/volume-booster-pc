@@ -193,7 +193,7 @@ and writes `dist\SHA256SUMS.txt`. On Linux, `./build.sh`.
 ## Tests
 
 ```
-python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify
+python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report
 python app.py --smoke
 python app.py --smoke-ui
 ```
@@ -229,6 +229,26 @@ el 500 % (1000 % si te empeñas), sin añadir latencia y sin telemetría.
 Si lo que buscabas era **subir el volumen en Windows 11 por encima del 100 %**, o
 una **aplicación para subir el volumen al 200 %** en el PC, esto es exactamente
 eso: un *volume booster* de escritorio, gratuito y de código abierto.
+
+---
+
+## Found a bug?
+
+There is a **Report a bug** link at the bottom of the window. It opens a GitHub
+issue with the version and your operating system already filled in, so you only
+have to describe what happened.
+
+If you prefer to do it by hand, use
+[Issues](../../issues/new?template=bug_report.yml). Attaching the support bundle
+from `--diagnostics` makes a fix much faster: run it, then drag the zip into the
+form. The bundle contains no audio, and your user name and home path are replaced
+by `<user>` / `<home>`.
+
+Things that help more than anything else:
+
+- The status bar text (`Applied`, `drift`, `not attached`, `engine not found`).
+- Whether Equalizer APO is installed, and whether your device is ticked in it.
+- The exact slider value that misbehaves.
 
 ---
 

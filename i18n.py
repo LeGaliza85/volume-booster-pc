@@ -28,6 +28,7 @@ LANGUAGES: dict[str, str] = {
 TRANSLATIONS: dict[str, dict[str, str]] = {
     "en": {
         "subtitle": "System-wide volume boost",
+        "report": "Report a bug",
         "exact": "Exact value",
         "apply": "Apply",
         "setup": "Setup",
@@ -71,6 +72,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     },
     "es": {
         "subtitle": "Amplificación de volumen del sistema",
+        "report": "Informar de un fallo",
         "exact": "Valor exacto",
         "apply": "Aplicar",
         "setup": "Configuración",
@@ -115,6 +117,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     },
     "fr": {
         "subtitle": "Amplification du volume système",
+        "report": "Signaler un bug",
         "exact": "Valeur exacte",
         "apply": "Appliquer",
         "setup": "Configuration",
@@ -160,6 +163,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     },
     "de": {
         "subtitle": "Systemweite Lautstärkeverstärkung",
+        "report": "Fehler melden",
         "exact": "Genauer Wert",
         "apply": "Übernehmen",
         "setup": "Einrichtung",
@@ -204,6 +208,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     },
     "it": {
         "subtitle": "Amplificazione del volume di sistema",
+        "report": "Segnala un bug",
         "exact": "Valore esatto",
         "apply": "Applica",
         "setup": "Configurazione",
@@ -248,6 +253,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     },
     "pt": {
         "subtitle": "Amplificação do volume do sistema",
+        "report": "Relatar um bug",
         "exact": "Valor exato",
         "apply": "Aplicar",
         "setup": "Configuração",
@@ -292,6 +298,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     },
     "ru": {
         "subtitle": "Усиление системной громкости",
+        "report": "Сообщить об ошибке",
         "exact": "Точное значение",
         "apply": "Применить",
         "setup": "Настройка",
@@ -336,6 +343,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     },
     "zh": {
         "subtitle": "系统音量增强",
+        "report": "报告问题",
         "exact": "精确数值",
         "apply": "应用",
         "setup": "设置",
@@ -378,6 +386,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     },
     "ja": {
         "subtitle": "システム全体の音量ブースト",
+        "report": "不具合を報告",
         "exact": "正確な値",
         "apply": "適用",
         "setup": "セットアップ",
