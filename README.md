@@ -115,15 +115,34 @@ The executable is **not code-signed**, because a signing certificate costs aroun
 warning for any new unsigned binary — it is a reputation warning, not a virus
 detection.
 
-Continue with **More info → Run anyway**, or verify the download instead:
+Continue with **More info → Run anyway**, or verify the download first — see
+[Verify the download](#verify-the-download).
+
+### Verify the download
+
+Every release publishes `SHA256SUMS-windows.txt`. Download it next to the
+executable and compare:
 
 ```powershell
-# Compare against SHA256SUMS.txt from the same release
 Get-FileHash .\VolumeBooster.exe -Algorithm SHA256
-
-# Or build it yourself (Python 3.11+)
-powershell -ExecutionPolicy Bypass -File build.ps1
 ```
+
+The output must match the `VolumeBooster.exe` line in `SHA256SUMS-windows.txt`.
+If it does not match, do not run the file.
+
+Three more ways to check what you are running:
+
+- **Read the code.** The whole program is in this repository, and all 15 test
+  suites are public. CI runs lint, types, unit tests and smoke tests on Windows
+  and Linux with Python 3.11–3.13:
+  [CI workflow](https://github.com/LeGaliza85/volume-booster-pc/actions/workflows/ci.yml).
+- **Build it yourself.** `build.ps1` produces the same executable from source
+  (Python 3.11+).
+- **VirusTotal.** [Report for v1.5.11](https://www.virustotal.com/gui/file/a2ef757d2ddc004765d22d9e06f6ba9c422dfad75dd0840e6bf1f04cf1f75637):
+  the report shows 1 malicious, 69 undetected, 4 type-unsupported and 1 timeout.
+  The single flag is the heuristic `BehavesLike.Win64.Backdoor.rc`, consistent
+  with the heuristic false positives that PyInstaller executables often trigger.
+  Newer releases link their own report in the release notes.
 
 ---
 
@@ -379,6 +398,37 @@ el 500 % (1000 % si te empeñas), sin añadir latencia y sin telemetría.
 - En Windows necesita [Equalizer APO](https://sourceforge.net/projects/equalizerapo/)
   instalado una vez: Windows no deja pasar del 100 % de otra forma.
 - En Linux usa `pactl` y no necesita nada más.
+
+### Verificar la descarga
+
+Cada release publica `SHA256SUMS-windows.txt`. Descárgalo junto al ejecutable y
+compara:
+
+```powershell
+Get-FileHash .\VolumeBooster.exe -Algorithm SHA256
+```
+
+El resultado debe coincidir con la línea de `VolumeBooster.exe` en
+`SHA256SUMS-windows.txt`. Si no coincide, no ejecutes el archivo.
+
+Otras tres formas de comprobar lo que ejecutas:
+
+- **Lee el código.** Todo el programa está en este repositorio y las 15 suites de
+  tests son públicas. La CI ejecuta lint, tipos, tests unitarios y smoke tests en
+  Windows y Linux con Python 3.11–3.13:
+  [workflow de CI](https://github.com/LeGaliza85/volume-booster-pc/actions/workflows/ci.yml).
+- **Compílalo tú.** `build.ps1` genera el mismo ejecutable desde el código
+  (Python 3.11+).
+- **VirusTotal.** [Informe de la v1.5.11](https://www.virustotal.com/gui/file/a2ef757d2ddc004765d22d9e06f6ba9c422dfad75dd0840e6bf1f04cf1f75637):
+  el informe muestra 1 malicioso, 69 no detectados, 4 con tipo no soportado y 1
+  timeout. La única marca es la heurística `BehavesLike.Win64.Backdoor.rc`,
+  coherente con los falsos positivos heurísticos que suelen provocar los
+  ejecutables de PyInstaller. Las versiones nuevas enlazan su propio informe en
+  las notas del release.
+
+El ejecutable no está firmado. Por eso SmartScreen muestra "Windows protegió tu
+PC": es un aviso de reputación para binarios nuevos sin firma, no una detección de
+virus.
 
 Si lo que buscabas era **subir el volumen en Windows 11 por encima del 100 %**, o
 una **aplicación para subir el volumen al 200 %** en el PC, esto es exactamente
