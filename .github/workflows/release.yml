@@ -61,11 +61,14 @@ jobs:
       # Optional: uploads the portable executable to VirusTotal when the repository
       # has a VIRUSTOTAL_API_KEY secret. The release body links the report by SHA-256.
       - name: VirusTotal
-        if: ${{ secrets.VIRUSTOTAL_API_KEY != '' }}
         shell: pwsh
         env:
           VT_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
         run: |
+          if ([string]::IsNullOrWhiteSpace($env:VT_API_KEY)) {
+            "VIRUSTOTAL_API_KEY is not set; skipping the upload."
+            exit 0
+          }
           $hash = (Get-FileHash -LiteralPath "dist/VolumeBooster.exe" -Algorithm SHA256).Hash.ToLower()
           $headers = @{ "x-apikey" = $env:VT_API_KEY }
           $form = @{ file = Get-Item -LiteralPath "dist/VolumeBooster.exe" }
