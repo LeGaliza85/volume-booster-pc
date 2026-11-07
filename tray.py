@@ -4,6 +4,12 @@ Pure ``ctypes``: no pystray, no Pillow. A hidden window receives the tray
 callback and ``WM_HOTKEY``; its message queue is pumped from a Tk ``after`` loop
 and filtered to that window, so Tk's own messages are never touched.
 
+The window procedure never touches Tk. Windows dispatches this window's messages
+inside Tcl's own message loop, with the GIL released, so calling Tkinter from the
+callback aborts the whole process (``PyEval_RestoreThread ... the current Python
+thread state is NULL``). The procedure only records what happened; ``pump()``,
+which runs from a Tk callback, is the one that acts on it.
+
 Everything here is best effort. ``start()`` returns False when Windows refuses
 (no Explorer, no icon, a broken class registration) and the caller falls back to
 an ordinary window — an app that vanishes because the tray failed would be worse
@@ -25,6 +31,8 @@ WM_NULL = 0x0000
 WM_LBUTTONUP = 0x0202
 WM_LBUTTONDBLCLK = 0x0203
 WM_RBUTTONUP = 0x0205
+NIN_SELECT = 0x0400
+NIN_KEYSELECT = 0x0401
 
 NIM_ADD = 0x00000000
 NIM_MODIFY = 0x00000001
@@ -178,6 +186,8 @@ class Tray:
         self._proc: object | None = None
         self._class_name = ""
         self._pending_menu = False
+        self._pending_open = False
+        self._pending_hotkeys: list[int] = []
         self._taskbar_created = 0
         self._hotkeys: dict[int, Callable[[], None]] = {}
         self._active = False
@@ -330,7 +340,7 @@ class Tray:
 
     # ----------------------------------------------------------------- pump
     def pump(self) -> None:
-        """Drain only this window's messages; Tk's queue is left alone."""
+        """Drain this window's messages, then act on what the procedure recorded."""
         if not self._active or self._hwnd is None:
             return
         try:
@@ -341,6 +351,19 @@ class Tray:
                 user32.DispatchMessageW(ctypes.byref(message))
         except (AttributeError, OSError):
             return
+        self._dispatch_pending()
+
+    def _dispatch_pending(self) -> None:
+        """Run the recorded actions from a Tk callback, never from the WNDPROC."""
+        if self._pending_open:
+            self._pending_open = False
+            self._on_open()
+        pending = self._pending_hotkeys
+        self._pending_hotkeys = []
+        for ident in pending:
+            callback = self._hotkeys.get(ident)
+            if callback is not None:
+                callback()
         if self._pending_menu:
             self._pending_menu = False
             self._show_menu()
@@ -384,15 +407,13 @@ class Tray:
             return 0
         if message == _CALLBACK:
             event = int(lparam) & 0xFFFF
-            if event in (WM_LBUTTONUP, WM_LBUTTONDBLCLK):
-                self._on_open()
+            if event in (WM_LBUTTONUP, WM_LBUTTONDBLCLK, NIN_SELECT, NIN_KEYSELECT):
+                self._pending_open = True
             elif event == WM_RBUTTONUP:
                 self._pending_menu = True
             return 0
         if message == WM_HOTKEY:
-            callback = self._hotkeys.get(int(wparam))
-            if callback is not None:
-                callback()
-                return 0
+            self._pending_hotkeys.append(int(wparam))
+            return 0
         user32, _shell32, _kernel32 = _libraries()
         return user32.DefWindowProcW(hwnd, message, wparam, lparam)

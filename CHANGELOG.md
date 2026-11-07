@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5.11] - 2026-11-07
+
+### Fixed
+
+- **Left-clicking the notification-area icon closed the app** instead of opening
+  the window: the icon vanished with the process. The icon's window procedure ran
+  Tkinter from a native callback that Windows dispatches inside Tcl's loop, with
+  the GIL released, and Python aborted the process (`0xC0000409`). The procedure
+  now only records the click, and the Tk loop acts on it. Global hotkeys used the
+  same unsafe path and are covered by the fix, and the modern `NIN_SELECT` /
+  `NIN_KEYSELECT` notifications now open the window too.
+
 ## [1.5.10] - 2026-11-01
 
 ### Added

@@ -323,7 +323,7 @@ and writes `dist\SHA256SUMS.txt`. On Linux, `./build.sh`.
 ## Tests
 
 ```
-python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report test_hotkey test_winenv test_preview test_update test_update_download test_updater
+python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report test_hotkey test_winenv test_preview test_update test_update_download test_updater test_tray
 python app.py --smoke
 python app.py --smoke-ui
 ```
