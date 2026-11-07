@@ -58,6 +58,21 @@ jobs:
             (Get-FileHash dist/VolumeBoosterSetup.exe -Algorithm SHA256).Hash + "  VolumeBoosterSetup.exe"
           )
           $lines | Set-Content dist/SHA256SUMS-windows.txt -Encoding ascii
+      # Optional: uploads the portable executable to VirusTotal when the repository
+      # has a VIRUSTOTAL_API_KEY secret. The release body links the report by SHA-256.
+      - name: VirusTotal
+        if: ${{ secrets.VIRUSTOTAL_API_KEY != '' }}
+        shell: pwsh
+        env:
+          VT_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
+        run: |
+          $hash = (Get-FileHash -LiteralPath "dist/VolumeBooster.exe" -Algorithm SHA256).Hash.ToLower()
+          $headers = @{ "x-apikey" = $env:VT_API_KEY }
+          $form = @{ file = Get-Item -LiteralPath "dist/VolumeBooster.exe" }
+          Invoke-RestMethod -Uri "https://www.virustotal.com/api/v3/files" `
+            -Method Post -Headers $headers -Form $form | Out-Null
+          "https://www.virustotal.com/gui/file/$hash" |
+            Set-Content -LiteralPath "dist/VIRUSTOTAL.txt" -Encoding utf8
       - uses: actions/upload-artifact@v4
         with:
           name: windows
@@ -66,6 +81,7 @@ jobs:
             dist/VolumeBooster-portable.zip
             dist/VolumeBoosterSetup.exe
             dist/SHA256SUMS-windows.txt
+            dist/VIRUSTOTAL.txt
 
   linux:
     runs-on: ubuntu-latest
@@ -101,8 +117,30 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
+      - name: Compose release body
+        run: |
+          {
+            echo "## Verify the download"
+            echo ""
+            echo 'Every release publishes `SHA256SUMS-windows.txt`. Compare it with the file you downloaded:'
+            echo ""
+            echo '```powershell'
+            echo 'Get-FileHash .\VolumeBooster.exe -Algorithm SHA256'
+            echo '```'
+            echo ""
+            echo 'The output must match the `VolumeBooster.exe` line in `SHA256SUMS-windows.txt`. If it does not match, do not run the file.'
+            echo ""
+            echo '- **Source and tests:** the full source and all 15 test suites are public, and CI runs them on Windows and Linux with Python 3.11-3.13: https://github.com/LeGaliza85/volume-booster-pc/actions/workflows/ci.yml'
+            echo '- **Build it yourself:** `build.ps1` produces the same executable from source.'
+            if [ -f artifacts/windows/VIRUSTOTAL.txt ]; then
+              echo "- **VirusTotal:** $(cat artifacts/windows/VIRUSTOTAL.txt | tr -d '\r\n')"
+            fi
+            echo ""
+            echo 'The executable is not code-signed, so SmartScreen shows "Windows protected your PC". That is a reputation warning for new unsigned binaries, not a virus detection.'
+          } > release-body.md
       - uses: softprops/action-gh-release@v2
         with:
+          body_path: release-body.md
           files: |
             artifacts/windows/VolumeBooster.exe
             artifacts/windows/VolumeBooster-portable.zip
