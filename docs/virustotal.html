@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VirusTotal report — Volume Booster PC</title>
+<meta name="description" content="VirusTotal report for the latest Volume Booster PC release, resolved from the SHA-256 published with the release.">
+<style>
+  :root { color-scheme: light dark; }
+  body { margin: 0; font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 42rem; margin: 0 auto; padding: 3rem 1.25rem; }
+  h1 { font-size: 1.8rem; line-height: 1.2; margin: 0 0 1rem; }
+  p { margin: 0 0 1rem; }
+  code { overflow-wrap: anywhere; }
+  .card { border: 1px solid rgba(127, 127, 127, .35); border-radius: .75rem; padding: 1.25rem; margin: 1.5rem 0; }
+  .button { display: inline-block; padding: .7rem 1rem; border-radius: .5rem; background: #1a73e8; color: #fff; text-decoration: none; font-weight: 600; }
+  .muted { opacity: .75; font-size: .95rem; }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <p class="muted"><a href="./">Volume Booster PC</a></p>
+  <h1>VirusTotal report</h1>
+  <p>This page resolves the VirusTotal report for the <strong>latest release</strong> from the SHA-256 that GitHub publishes for the <code>VolumeBooster.exe</code> asset.</p>
+  <div class="card">
+    <p id="status">Looking up the latest release…</p>
+    <p id="hash" class="muted" hidden></p>
+    <p><a id="report" class="button" hidden rel="noopener">Open the VirusTotal report</a></p>
+  </div>
+  <p class="muted">No report yet? The release workflow uploads the executable to VirusTotal when the repository secret <code>VIRUSTOTAL_API_KEY</code> is configured. If VirusTotal has not finished analysing that hash, its page will say so.</p>
+  <p class="muted"><a href="https://github.com/LeGaliza85/volume-booster-pc/releases/latest" rel="noopener">All releases</a> · <a href="https://github.com/LeGaliza85/volume-booster-pc" rel="noopener">Source code</a></p>
+</main>
+<script>
+  const status = document.getElementById("status");
+  const hashLine = document.getElementById("hash");
+  const link = document.getElementById("report");
+
+  fetch("https://api.github.com/repos/LeGaliza85/volume-booster-pc/releases/latest", {
+    headers: { Accept: "application/vnd.github+json" }
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error("GitHub API returned HTTP " + response.status);
+      return response.json();
+    })
+    .then((release) => {
+      const asset = (release.assets || []).find((item) => item.name === "VolumeBooster.exe");
+      const digest = asset && asset.digest
+        ? String(asset.digest).replace(/^sha256:/i, "").toLowerCase()
+        : "";
+      if (!digest) throw new Error("the latest release does not publish a SHA-256 digest yet");
+      status.textContent = "Release " + release.tag_name + " — the report is generated from the exact executable below.";
+      hashLine.textContent = "SHA-256: " + digest;
+      hashLine.hidden = false;
+      link.href = "https://www.virustotal.com/gui/file/" + digest;
+      link.hidden = false;
+    })
+    .catch((error) => {
+      status.textContent = "Could not resolve the report automatically: " + error.message + ".";
+      link.href = "https://github.com/LeGaliza85/volume-booster-pc/releases/latest";
+      link.textContent = "Open the latest release";
+      link.hidden = false;
+    });
+</script>
+</body>
+</html>

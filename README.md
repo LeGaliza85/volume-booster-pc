@@ -138,11 +138,9 @@ Three more ways to check what you are running:
   [CI workflow](https://github.com/LeGaliza85/volume-booster-pc/actions/workflows/ci.yml).
 - **Build it yourself.** `build.ps1` produces the same executable from source
   (Python 3.11+).
-- **VirusTotal.** [Report for v1.5.11](https://www.virustotal.com/gui/file/a2ef757d2ddc004765d22d9e06f6ba9c422dfad75dd0840e6bf1f04cf1f75637):
-  the report shows 1 malicious, 69 undetected, 4 type-unsupported and 1 timeout.
-  The single flag is the heuristic `BehavesLike.Win64.Backdoor.rc`, consistent
-  with the heuristic false positives that PyInstaller executables often trigger.
-  Newer releases link their own report in the release notes.
+- **VirusTotal.** [Report for the latest release](https://legaliza85.github.io/volume-booster-pc/virustotal.html):
+  the page reads the SHA-256 that GitHub publishes for the release asset and
+  links the matching VirusTotal report, so it never points at a stale build.
 
 ---
 
@@ -419,12 +417,10 @@ Otras tres formas de comprobar lo que ejecutas:
   [workflow de CI](https://github.com/LeGaliza85/volume-booster-pc/actions/workflows/ci.yml).
 - **Compílalo tú.** `build.ps1` genera el mismo ejecutable desde el código
   (Python 3.11+).
-- **VirusTotal.** [Informe de la v1.5.11](https://www.virustotal.com/gui/file/a2ef757d2ddc004765d22d9e06f6ba9c422dfad75dd0840e6bf1f04cf1f75637):
-  el informe muestra 1 malicioso, 69 no detectados, 4 con tipo no soportado y 1
-  timeout. La única marca es la heurística `BehavesLike.Win64.Backdoor.rc`,
-  coherente con los falsos positivos heurísticos que suelen provocar los
-  ejecutables de PyInstaller. Las versiones nuevas enlazan su propio informe en
-  las notas del release.
+- **VirusTotal.** [Informe de la última versión](https://legaliza85.github.io/volume-booster-pc/virustotal.html):
+  la página lee el SHA-256 que GitHub publica para el archivo del release y
+  enlaza el informe correspondiente de VirusTotal, así que nunca apunta a una
+  versión antigua.
 
 El ejecutable no está firmado. Por eso SmartScreen muestra "Windows protegió tu
 PC": es un aviso de reputación para binarios nuevos sin firma, no una detección de
