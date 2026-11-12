@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **The app reported "everything is fine" while the boost was applied to the wrong
+  device.** Equalizer APO is installed per playback endpoint, and the check only
+  asked whether *any* endpoint had it. A TV with the APO attached made the status
+  green while the default output (for example, USB speakers) was not boosted at
+  all. The health check now resolves Windows' default playback device through
+  `IMMDeviceEnumerator` and reports `detached` when that endpoint lacks the APO;
+  when the default cannot be determined it keeps the previous behaviour instead
+  of guessing.
+
 ## [1.5.11] - 2026-11-07
 
 ### Fixed

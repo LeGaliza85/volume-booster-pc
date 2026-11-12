@@ -9,6 +9,9 @@ import verify
 SLOT_5 = "{d04e05a6-594b-4fb6-a80d-01af5eed7d1d},5"
 SLOT_7 = "{d04e05a6-594b-4fb6-a80d-01af5eed7d1d},7"
 OTHER = "{b725f130-47ef-101a-a5f1-02608c9eebac},10"
+TV = "{11111111-1111-1111-1111-111111111111}"
+SPEAKERS = "{22222222-2222-2222-2222-222222222222}"
+SPEAKERS_DEVICE_ID = f"{{0.0.0.00000000}}.{SPEAKERS}"
 
 
 class AttachmentTests(unittest.TestCase):
@@ -50,12 +53,13 @@ class PreampTests(unittest.TestCase):
 
 
 class HealthTests(unittest.TestCase):
-    def _health(self, text, expected, installed=True, endpoints=None):
+    def _health(self, text, expected, installed=True, endpoints=None, default_id=None):
         return verify.health(
             text,
             expected,
             is_installed=lambda: installed,
             list_endpoints=lambda: endpoints or [],
+            default_id=default_id,
         )
 
     def test_ok_when_attached_and_block_matches(self):
@@ -83,9 +87,49 @@ class HealthTests(unittest.TestCase):
     def test_missing_when_not_installed(self):
         self.assertEqual(self._health("Preamp: 0.00 dB", 0.0, installed=False)["level"], "missing")
 
-    def test_one_attached_device_is_enough(self):
+    def test_unknown_default_keeps_any_attached_device(self):
         endpoints = [{"name": "HDMI", "attached": False}, {"name": "Auriculares", "attached": True}]
         self.assertEqual(self._health("Preamp: 13.98 dB", 13.98, endpoints=endpoints)["level"], "ok")
+
+    def test_detached_when_the_default_device_lacks_the_apo(self):
+        endpoints = [
+            {"id": TV, "name": "TV", "attached": True},
+            {"id": SPEAKERS, "name": "Altavoces", "attached": False},
+        ]
+        result = self._health(
+            "Preamp: 13.98 dB", 13.98, endpoints=endpoints, default_id=SPEAKERS_DEVICE_ID
+        )
+        self.assertEqual(result["level"], "detached")
+        self.assertEqual(result["default"], "Altavoces")
+
+    def test_ok_when_the_default_device_has_the_apo(self):
+        endpoints = [
+            {"id": TV, "name": "TV", "attached": False},
+            {"id": SPEAKERS, "name": "Altavoces", "attached": True},
+        ]
+        result = self._health(
+            "Preamp: 13.98 dB", 13.98, endpoints=endpoints, default_id=SPEAKERS_DEVICE_ID
+        )
+        self.assertEqual(result["level"], "ok")
+
+    def test_default_missing_from_the_list_does_not_invent_detached(self):
+        endpoints = [{"name": "TV", "attached": True}]
+        result = self._health("Preamp: 0.00 dB", 0.0, endpoints=endpoints, default_id=SPEAKERS_DEVICE_ID)
+        self.assertEqual(result["level"], "ok")
+
+
+class EndpointGuidTests(unittest.TestCase):
+    def test_tail_guid_is_extracted_and_lowercased(self):
+        self.assertEqual(
+            verify.endpoint_guid("{0.0.0.00000000}.{2B2E13FA-4964-4D96-A6C6-359B022B53C5}"),
+            "{2b2e13fa-4964-4d96-a6c6-359b022b53c5}",
+        )
+
+    def test_bare_guid_is_kept(self):
+        self.assertEqual(verify.endpoint_guid(SPEAKERS), SPEAKERS)
+
+    def test_empty_value(self):
+        self.assertEqual(verify.endpoint_guid(None), "")
 
 
 if __name__ == "__main__":
