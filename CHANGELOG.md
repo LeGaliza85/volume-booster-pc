@@ -8,12 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- **The slider now moves in decibels, not in raw percentage.** The gain written
-  to Equalizer APO was always correct (`20·log10(p/100)`), but the thumb was
-  linear in percentage: 0–100 % took the first tenth of the track and the last
-  14 dB (200→1000 %) were squeezed into the end, so the top half of the slider
-  felt dead. Travel is now linear in dB, 100 % sits at two thirds, and equal
-  drags produce equal changes.
 - **Closing the app now restores 100 % by default.** `restore_on_exit` was off,
   so quitting left Equalizer APO applying the boost with no window open and no
   visible way to undo it. It is now on by default and can still be turned off in

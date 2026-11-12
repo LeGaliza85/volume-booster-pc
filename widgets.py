@@ -267,18 +267,12 @@ class ModernSlider(tk.Canvas):
         on_change,
         on_release,
         bg: str = T.BG,
-        position_of=None,
-        value_at=None,
     ) -> None:
         super().__init__(master, bg=bg, highlightthickness=0, bd=0, height=self.HEIGHT)
         self.minimum, self.maximum = minimum, maximum
         self._value = int(value)
         self._on_change = on_change
         self._on_release = on_release
-        # Position and value are separate scales: the app maps travel to dB and
-        # the default stays linear for any other caller.
-        self._position_of = position_of or self._linear_position
-        self._value_at = value_at or self._linear_value
 
         self.configure(cursor="hand2", takefocus=1)
         self.bind("<Configure>", lambda _event: self._draw())
@@ -318,15 +312,8 @@ class ModernSlider(tk.Canvas):
     def _track_width(self) -> float:
         return max(1.0, self.winfo_width() - 2 * self.PADDING)
 
-    def _linear_position(self, value: int) -> float:
-        span = self.maximum - self.minimum
-        return (value - self.minimum) / span if span else 0.0
-
-    def _linear_value(self, ratio: float) -> int:
-        return round(self.minimum + ratio * (self.maximum - self.minimum))
-
     def _thumb_x(self) -> float:
-        ratio = max(0.0, min(1.0, self._position_of(self._value)))
+        ratio = (self._value - self.minimum) / (self.maximum - self.minimum)
         return self.PADDING + ratio * self._track_width()
 
     def _on_click(self, event) -> None:
@@ -342,7 +329,7 @@ class ModernSlider(tk.Canvas):
     def _set_from_x(self, x: float) -> None:
         ratio = (x - self.PADDING) / self._track_width()
         ratio = max(0.0, min(1.0, ratio))
-        self.set_value(int(self._value_at(ratio)), notify=True)
+        self.set_value(round(self.minimum + ratio * (self.maximum - self.minimum)), notify=True)
 
     def _bar(self, left: float, right: float, centre: float, colour: str) -> None:
         half = self.TRACK_WIDTH // 2
