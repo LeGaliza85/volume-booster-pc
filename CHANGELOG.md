@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **Changing the maximum boost now repositions the slider and the applied
+  value, and confirms it in green in Settings.** Lowering the ceiling below the
+  current level clamps the level to the new ceiling.
+- **The device picker button now opens Equalizer APO's device selector.** The
+  tool requests administrator rights in its manifest, so starting it with
+  `subprocess.Popen` was refused with WinError 740 and the app showed "could not
+  open it automatically". It is now launched through the `runas` verb, which
+  shows the UAC prompt and opens the selector.
 - **Closing the app now restores 100 % by default.** `restore_on_exit` was off,
   so quitting left Equalizer APO applying the boost with no window open and no
   visible way to undo it. It is now on by default and can still be turned off in

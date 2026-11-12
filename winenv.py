@@ -44,18 +44,33 @@ def _startfile(target: str) -> bool:
 
 
 def _launch(path: Path) -> bool:
-    """Start an executable with its own folder as the working directory.
+    """Start an elevated Qt tool with its own folder as the working directory.
 
-    Equalizer APO's Qt tools ship plugins in ``qt/platforms`` and have no
-    ``qt.conf``, so they only find them when the process starts inside their
-    folder. ``os.startfile`` inherits our directory, which is why the Device
-    Selector died with "no Qt platform plugin could be initialized".
+    The Equalizer APO device picker requests administrator rights in its
+    manifest, so ``subprocess.Popen`` is refused with WinError 740. The
+    ``runas`` verb shows the UAC prompt and then starts it. The working
+    directory matters too: the Qt tools ship plugins in ``qt/platforms`` and
+    have no ``qt.conf``, so they only find them when the process starts inside
+    their folder.
     """
     try:
-        subprocess.Popen([str(path)], cwd=str(path.parent))
-    except OSError:
+        import ctypes
+        from ctypes import wintypes
+
+        shell32 = ctypes.WinDLL("shell32", use_last_error=True)
+        shell32.ShellExecuteW.argtypes = (
+            wintypes.HWND,
+            wintypes.LPCWSTR,
+            wintypes.LPCWSTR,
+            wintypes.LPCWSTR,
+            wintypes.LPCWSTR,
+            ctypes.c_int,
+        )
+        shell32.ShellExecuteW.restype = ctypes.c_void_p
+        result = shell32.ShellExecuteW(None, "runas", str(path), None, str(path.parent), 1)
+    except (AttributeError, OSError):
         return False
-    return True
+    return int(result or 0) > 32
 
 
 def configurator() -> Path | None:

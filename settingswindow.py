@@ -216,6 +216,15 @@ class SettingsWindow:
         entry.bind("<Return>", lambda _event: self._set_max(entry))
         entry.bind("<FocusOut>", lambda _event: self._set_max(entry))
         self._max_entry = entry
+        self._max_status = tk.Label(
+            self.top,
+            text="",
+            bg=T.BG,
+            fg=T.OK,
+            font=(self.app.family, T.px(8)),
+            anchor="w",
+        )
+        self._max_status.pack(fill="x", padx=22, pady=(2, 0))
 
     def _commit_max(self) -> None:
         if self._max_entry is not None:
@@ -230,6 +239,7 @@ class SettingsWindow:
         value = self.app.set_max_percent(value)
         entry.delete(0, "end")
         entry.insert(0, str(value))
+        self._max_status.configure(text=self.app.t("max_applied", max=value))
 
     def _on_field_click(self, key: str, _event) -> None:
         self._start_capture(key)

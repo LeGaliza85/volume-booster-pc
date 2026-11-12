@@ -696,6 +696,7 @@ class AmplifierApp:
         else:
             self.slider.set_value(self.percent)
         LOG.info("max_percent set to %s", ceiling)
+        self._set_status(self.t("max_applied", max=ceiling), "ok")
         return ceiling
 
     def _rebuild(self) -> None:
@@ -941,6 +942,20 @@ def _smoke_ui() -> int:
 
             window._set_language("en")
             root.update()
+
+            window.set_max_percent(800)
+            root.update()
+            assert window.slider.maximum == 800, window.slider.maximum
+            assert window.slider.get() == window.percent == 250, (window.slider.get(), window.percent)
+            assert "800" in window.status_var.get(), window.status_var.get()
+
+            window.set_max_percent(200)
+            root.update()
+            assert window.slider.maximum == 200, window.slider.maximum
+            assert window.percent == 200, window.percent
+            assert window.slider.get() == 200, window.slider.get()
+            assert "200" in window.status_var.get(), window.status_var.get()
+
             window.slider.set_value(0, notify=True)
             window._on_slide_release(0)
             root.update()
