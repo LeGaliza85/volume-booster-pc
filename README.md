@@ -226,13 +226,13 @@ Three rails worth knowing:
   Mark-of-the-Web, so SmartScreen does not get a say. That is normal for an
   updater, and it is also why step 2 exists: the hash is the check.
 
-`%APPDATA%\VolumeBooster\settings.json` can also be edited by hand:
+`%LOCALAPPDATA%\VolumeBooster\settings.json` can also be edited by hand:
 
 | Key | Default | Range | Meaning |
 |---|---|---|---|
 | `max_percent` | `500` | 100–1000 | Slider ceiling |
 | `confirm_above` | `300` | 0–1000 | Ask before jumping above this level; `0` disables the question |
-| `restore_on_exit` | `false` | bool | Set the gain back to 100 % when the app closes |
+| `restore_on_exit` | `true` | bool | Set the gain back to 100 % when the app closes |
 | `start_hidden` | `true` | bool | Start in the notification area |
 | `close_to_tray` | `true` | bool | Closing the window hides it instead of quitting |
 | `hotkey_up` | `Ctrl+Alt+Up` | hotkey | Louder by 10 %; empty string disables it |
@@ -340,7 +340,7 @@ and writes `dist\SHA256SUMS.txt`. On Linux, `./build.sh`.
 ## Tests
 
 ```
-python -m unittest test_configfile test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report test_hotkey test_winenv test_preview test_update test_update_download test_updater test_tray
+python -m unittest test_configfile test_gainmath test_apo test_i18n test_platform test_settings test_diagnostics test_verify test_report test_hotkey test_winenv test_preview test_update test_update_download test_updater test_tray
 python app.py --smoke
 python app.py --smoke-ui
 ```

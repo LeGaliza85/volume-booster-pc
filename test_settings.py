@@ -29,9 +29,10 @@ class SanitizeTests(unittest.TestCase):
         data = settings.sanitize({"max_percent": 200, "confirm_above": 800})
         self.assertEqual(data["confirm_above"], 200)
 
-    def test_restore_on_exit_requires_a_bool(self):
-        self.assertFalse(settings.sanitize({"restore_on_exit": "yes"})["restore_on_exit"])
+    def test_restore_on_exit_only_accepts_bools(self):
+        self.assertTrue(settings.sanitize({"restore_on_exit": "yes"})["restore_on_exit"])
         self.assertTrue(settings.sanitize({"restore_on_exit": True})["restore_on_exit"])
+        self.assertFalse(settings.sanitize({"restore_on_exit": False})["restore_on_exit"])
 
     def test_unknown_keys_are_dropped(self):
         data = settings.sanitize({"dangerous": 1})

@@ -15,7 +15,7 @@ import hotkey
 DEFAULTS: dict = {
     "max_percent": 500,
     "confirm_above": 300,
-    "restore_on_exit": False,
+    "restore_on_exit": True,
     "start_hidden": True,
     "close_to_tray": True,
     "hotkey_up": "Ctrl+Alt+Up",

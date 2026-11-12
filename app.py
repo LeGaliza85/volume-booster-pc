@@ -266,6 +266,12 @@ class AmplifierApp:
             value=self.percent,
             on_change=self._on_slide,
             on_release=self._on_slide_release,
+            position_of=lambda value: gainmath.percent_to_position(
+                value, self.settings["max_percent"]
+            ),
+            value_at=lambda ratio: gainmath.position_to_percent(
+                ratio, self.settings["max_percent"]
+            ),
         )
         self.slider.pack(fill="x")
 
