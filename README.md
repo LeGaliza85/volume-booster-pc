@@ -77,6 +77,10 @@ music at the volume you want:** also 0 €.
 - **Nine languages**, chosen automatically from your system language.
 - **Lives next to the clock.** One small window and a tray icon; no background
   service, no driver, nothing running that you did not ask for.
+- **Restores the level when you quit.** By default, exiting sets the gain back to
+  100 %, so the boost cannot survive with no window open. The X hides the window
+  in the notification area; use **Quit** in the tray menu to exit. It can be
+  turned off in Settings.
 - **Tells you about new releases when you ask.** A *Check for updates* link, plus
   an optional check at startup that is off by default.
 
@@ -396,6 +400,10 @@ el 500 % (1000 % si te empeñas), sin añadir latencia y sin telemetría.
 - En Windows necesita [Equalizer APO](https://sourceforge.net/projects/equalizerapo/)
   instalado una vez: Windows no deja pasar del 100 % de otra forma.
 - En Linux usa `pactl` y no necesita nada más.
+- **Devuelve el nivel al salir.** Por defecto, cerrar la app vuelve al 100 %, para
+  que el refuerzo no quede activo sin ninguna ventana abierta. La X solo la oculta
+  en la bandeja; para salir del todo, usa **Salir** en el menú del icono. Se puede
+  desactivar en Configuración.
 
 ### Verificar la descarga
 

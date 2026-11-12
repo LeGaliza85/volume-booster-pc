@@ -1,4 +1,4 @@
-"""Volume Booster PC - system-wide volume boost from 0 to 500 %."""
+"""Volume Booster PC - system-wide volume boost from 0 to 1000 %."""
 
 from __future__ import annotations
 

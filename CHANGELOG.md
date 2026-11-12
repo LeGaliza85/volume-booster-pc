@@ -4,31 +4,30 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.5.12] - 2026-11-12
 
 ### Fixed
 
-- **Changing the maximum boost now repositions the slider and the applied
-  value, and confirms it in green in Settings.** Lowering the ceiling below the
-  current level clamps the level to the new ceiling.
+- **The app reported "everything is fine" while the boost was applied to the
+  wrong device.** Equalizer APO is installed per playback endpoint, and the check
+  only asked whether *any* endpoint had it. A TV with the APO attached made the
+  status green while the default output (for example, USB speakers) was not
+  boosted at all. The health check now resolves Windows' default playback device
+  through `IMMDeviceEnumerator` and reports `detached` when that endpoint lacks
+  the APO; when the default cannot be determined it keeps the previous behaviour
+  instead of guessing.
 - **The device picker button now opens Equalizer APO's device selector.** The
   tool requests administrator rights in its manifest, so starting it with
   `subprocess.Popen` was refused with WinError 740 and the app showed "could not
   open it automatically". It is now launched through the `runas` verb, which
   shows the UAC prompt and opens the selector.
+- **Changing the maximum boost now repositions the slider and the applied
+  value, and confirms it in green in Settings.** Lowering the ceiling below the
+  current level clamps the level to the new ceiling.
 - **Closing the app now restores 100 % by default.** `restore_on_exit` was off,
   so quitting left Equalizer APO applying the boost with no window open and no
   visible way to undo it. It is now on by default and can still be turned off in
   Settings.
-
-- **The app reported "everything is fine" while the boost was applied to the wrong
-  device.** Equalizer APO is installed per playback endpoint, and the check only
-  asked whether *any* endpoint had it. A TV with the APO attached made the status
-  green while the default output (for example, USB speakers) was not boosted at
-  all. The health check now resolves Windows' default playback device through
-  `IMMDeviceEnumerator` and reports `detached` when that endpoint lacks the APO;
-  when the default cannot be determined it keeps the previous behaviour instead
-  of guessing.
 
 ## [1.5.11] - 2026-11-07
 
